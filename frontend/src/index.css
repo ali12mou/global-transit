@@ -26,3 +26,29 @@ body {
 :lang(om) {
   font-family: "Noto Sans Ethiopic", "Segoe UI", sans-serif;
 }
+
+@keyframes gt-logo-marquee-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.gt-logo-marquee {
+  display: flex;
+  width: max-content;
+  align-items: center;
+  animation: gt-logo-marquee-scroll var(--gt-marquee-duration, 30s) linear infinite;
+}
+
+.group:hover .gt-logo-marquee {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gt-logo-marquee {
+    animation: none;
+  }
+}

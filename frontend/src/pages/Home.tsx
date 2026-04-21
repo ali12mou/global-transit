@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { Fragment, useEffect, useMemo, useState } from "react";
+import { Fragment, useEffect, useMemo, useState, type ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
@@ -59,6 +59,35 @@ type Project = {
   imageUrl: string;
   slug: string;
 };
+
+function LogoMarquee<T extends { _id: string }>({
+  items,
+  renderItem,
+  durationSec = 30,
+}: {
+  items: T[];
+  renderItem: (item: T, idx: number) => ReactNode;
+  durationSec?: number;
+}) {
+  if (items.length === 0) return null;
+  const loopItems = [...items, ...items];
+  return (
+    <div className="group relative overflow-hidden">
+      <div
+        className="gt-logo-marquee"
+        style={{ ["--gt-marquee-duration" as string]: `${durationSec}s` }}
+      >
+        {loopItems.map((item, idx) => (
+          <div key={`${item._id}-${idx}`} className="shrink-0">
+            {renderItem(item, idx)}
+          </div>
+        ))}
+      </div>
+      <div className="pointer-events-none absolute inset-y-0 left-0 w-10 bg-gradient-to-r from-white to-transparent md:w-16" />
+      <div className="pointer-events-none absolute inset-y-0 right-0 w-10 bg-gradient-to-l from-white to-transparent md:w-16" />
+    </div>
+  );
+}
 
 export function Home() {
   const { t } = useTranslation();
@@ -398,29 +427,32 @@ export function Home() {
                     <h3 className="text-start font-[family-name:var(--font-display)] text-lg font-semibold text-[color:var(--color-gt-navy)]">
                       {t(`partnerType.${partnerTypeI18nKey(typeKey)}`)}
                     </h3>
-                    <div className="mt-4 flex flex-wrap items-center justify-center gap-8 md:justify-start">
-                      {list.map((p) => (
-                        <div
-                          key={p._id}
-                          className="flex min-h-[72px] min-w-[140px] flex-col items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-sm"
-                        >
-                          {p.logoUrl ? (
-                            <img src={p.logoUrl} alt={p.name} className="max-h-14 max-w-[160px] object-contain" />
-                          ) : (
-                            <span className="text-center text-sm font-medium text-slate-700">{p.name}</span>
-                          )}
-                          {p.url && (
-                            <a
-                              href={p.url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="mt-2 text-xs text-sky-700 hover:underline"
-                            >
-                              {t("home.siteLink")}
-                            </a>
-                          )}
-                        </div>
-                      ))}
+                    <div className="mt-4">
+                      <LogoMarquee
+                        items={list}
+                        durationSec={32}
+                        renderItem={(p) => {
+                          return (
+                            <div className="mx-2 flex min-h-[86px] min-w-[170px] flex-col items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-3 shadow-sm">
+                              {p.logoUrl ? (
+                                <img src={p.logoUrl} alt={p.name} className="max-h-14 max-w-[160px] object-contain" />
+                              ) : (
+                                <span className="text-center text-sm font-medium text-slate-700">{p.name}</span>
+                              )}
+                              {p.url && (
+                                <a
+                                  href={p.url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="mt-2 text-xs text-sky-700 hover:underline"
+                                >
+                                  {t("home.siteLink")}
+                                </a>
+                              )}
+                            </div>
+                          );
+                        }}
+                      />
                     </div>
                   </div>
                 );
@@ -436,19 +468,25 @@ export function Home() {
           <h2 className="mt-3 font-[family-name:var(--font-display)] text-3xl text-[color:var(--color-gt-navy)]">
             {t("home.clientsTitle")}
           </h2>
-          <div className="mx-auto mt-10 flex min-h-[120px] flex-wrap items-center justify-center gap-8 rounded-xl border-2 border-dashed border-slate-300 bg-white p-8">
+          <div className="mx-auto mt-10 min-h-[120px] rounded-xl border-2 border-dashed border-slate-300 bg-white p-4 md:p-6">
             {clients.length === 0 ? (
               <p className="text-slate-500">{t("home.clientsEmpty")}</p>
             ) : (
-              clients.map((c) => (
-                <div key={c._id} className="flex flex-col items-center gap-2">
-                  {c.logoUrl ? (
-                    <img src={c.logoUrl} alt={c.name} className="h-12 object-contain" />
-                  ) : (
-                    <span className="text-sm font-medium text-slate-700">{c.name}</span>
-                  )}
-                </div>
-              ))
+              <LogoMarquee
+                items={clients}
+                durationSec={28}
+                renderItem={(c) => {
+                  return (
+                    <div className="mx-3 flex min-h-[82px] min-w-[160px] items-center justify-center rounded-xl border border-slate-200 bg-white px-5 py-3 shadow-sm">
+                      {c.logoUrl ? (
+                        <img src={c.logoUrl} alt={c.name} className="max-h-12 max-w-[130px] object-contain" />
+                      ) : (
+                        <span className="text-sm font-medium text-slate-700">{c.name}</span>
+                      )}
+                    </div>
+                  );
+                }}
+              />
             )}
           </div>
         </div>

@@ -66,8 +66,28 @@ export function AdminLayout() {
             </button>
           </div>
         </header>
+        <nav className="border-b border-slate-200/80 bg-white/90 px-3 py-2 backdrop-blur md:hidden">
+          <div className="flex gap-2 overflow-x-auto pb-1">
+            {adminNavItems.map(({ to, labelKey }) => (
+              <NavLink
+                key={`mobile-${to}`}
+                to={to}
+                end={to === "/admin"}
+                className={({ isActive }) =>
+                  `shrink-0 rounded-full border px-3 py-1.5 text-xs font-semibold transition ${
+                    isActive
+                      ? "border-[color:var(--color-gt-navy)] bg-[color:var(--color-gt-navy)] text-white"
+                      : "border-slate-300 bg-white text-slate-700 hover:border-slate-400"
+                  }`
+                }
+              >
+                {t(labelKey)}
+              </NavLink>
+            ))}
+          </div>
+        </nav>
         <main className="flex-1 overflow-auto p-4 md:p-8 lg:p-10">
-          <div className="mx-auto max-w-6xl">
+          <div className="mx-auto w-full max-w-7xl">
             <Outlet />
           </div>
         </main>

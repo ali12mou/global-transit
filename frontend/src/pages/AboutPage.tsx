@@ -38,11 +38,11 @@ export function AboutPage() {
   const { t } = useTranslation();
 
   return (
-    <div className="bg-white">
-      <section className="border-b border-slate-100 bg-white">
-        <div className="mx-auto max-w-7xl px-4 py-14 md:py-20">
-          <div className="grid gap-12 lg:grid-cols-12 lg:items-start">
-            <div className="lg:col-span-7">
+    <div className="bg-slate-50/60">
+      <section className="border-b border-slate-200/80 bg-gradient-to-b from-white to-slate-50/70">
+        <div className="mx-auto w-full max-w-[1440px] px-4 py-12 sm:px-6 md:py-16 lg:px-8 xl:px-10 2xl:py-20">
+          <div className="grid gap-8 lg:grid-cols-12 lg:items-start xl:gap-12">
+            <div className="lg:col-span-7 xl:col-span-8">
               <p className="text-xs font-bold uppercase tracking-[0.2em] text-[color:var(--color-gt-accent-green)]">
                 {t("about.kicker")}
               </p>
@@ -51,9 +51,9 @@ export function AboutPage() {
               </h1>
               <p className="mt-6 max-w-2xl text-base leading-relaxed text-slate-600 md:text-lg">{t("about.intro")}</p>
             </div>
-            <div className="lg:col-span-5">
-              <div className="rounded-2xl border border-slate-200/90 bg-slate-50/50 p-6 shadow-sm">
-                <div className="flex items-start gap-4">
+            <div className="lg:col-span-5 xl:col-span-4">
+              <div className="rounded-3xl border border-slate-200/90 bg-white/90 p-5 shadow-[0_10px_28px_rgba(15,23,42,0.07)] sm:p-6 lg:sticky lg:top-24">
+                <div className="flex flex-col items-start gap-4 sm:flex-row">
                   <div className="shrink-0 rounded-xl bg-white p-2 shadow-sm ring-1 ring-slate-200/80">
                     <Logo variant="header" className="max-w-[240px] sm:max-w-[260px]" />
                   </div>
@@ -72,10 +72,10 @@ export function AboutPage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-4 py-14 md:py-16">
-        <div className="grid gap-10 lg:grid-cols-12 lg:gap-12">
-          <div className="space-y-10 lg:col-span-8">
-            <div>
+      <section className="mx-auto w-full max-w-[1440px] px-4 py-12 sm:px-6 md:py-14 lg:px-8 xl:px-10 2xl:py-16">
+        <div className="grid gap-8 xl:grid-cols-12 xl:gap-10">
+          <div className="space-y-8 xl:col-span-8 2xl:col-span-9">
+            <div className="rounded-3xl border border-slate-200/80 bg-white p-5 shadow-[0_8px_24px_rgba(15,23,42,0.05)] sm:p-6 lg:p-8">
               <h2 className="font-[family-name:var(--font-display)] text-2xl font-bold text-[color:var(--color-gt-navy)] md:text-3xl">
                 {t("about.missionH2")}
               </h2>
@@ -84,7 +84,7 @@ export function AboutPage() {
                 <p>{t("about.missionP2")}</p>
               </div>
 
-              <div className="mt-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-[0_1px_3px_rgba(15,23,42,0.06)]">
+              <div className="mt-8 rounded-2xl border border-slate-200 bg-slate-50/60 p-4 sm:p-5">
                 <div className="mb-4 flex items-center justify-between gap-3">
                   <h3 className="font-[family-name:var(--font-display)] text-lg font-semibold text-[color:var(--color-gt-navy)]">
                     {t("about.strengthsTitle")}
@@ -112,11 +112,11 @@ export function AboutPage() {
               </div>
             </div>
 
-            <div>
+            <div className="rounded-3xl border border-slate-200/80 bg-white p-5 shadow-[0_8px_24px_rgba(15,23,42,0.05)] sm:p-6 lg:p-8">
               <h2 className="font-[family-name:var(--font-display)] text-2xl font-bold text-[color:var(--color-gt-navy)] md:text-3xl">
                 {t("about.servicesH2")}
               </h2>
-              <div className="mt-6 grid gap-4 sm:grid-cols-2">
+              <div className="mt-6 grid gap-4 sm:grid-cols-2 2xl:grid-cols-3">
                 {serviceCardKeys.map((s) => (
                   <div
                     key={s.title}
@@ -131,10 +131,127 @@ export function AboutPage() {
                 ))}
               </div>
             </div>
+
+            <div className="rounded-3xl border border-slate-200/80 bg-white p-5 shadow-[0_8px_24px_rgba(15,23,42,0.05)] sm:p-6 lg:p-8">
+              <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+                <h2 className="font-[family-name:var(--font-display)] text-2xl font-bold text-[color:var(--color-gt-navy)] md:text-3xl">
+                  {t("about.expertsH2")}
+                </h2>
+                <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-600">
+                  {t("about.expertsBadge")}
+                </span>
+              </div>
+
+              <div className="grid gap-6">
+                <article className="overflow-hidden rounded-3xl border border-[color:var(--color-gt-navy)]/20 bg-gradient-to-br from-white via-slate-50 to-slate-100 shadow-[0_12px_30px_rgba(15,23,42,0.08)]">
+                  <div className="grid md:grid-cols-[320px_1fr]">
+                    <div className="relative h-[28rem] md:h-full">
+                      <img
+                        src="/images/team/ibrahim-mouse.png"
+                        alt={t("about.ibrahimName")}
+                        className="h-full w-full object-cover object-top"
+                        loading="lazy"
+                      />
+                      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-slate-900/45 to-transparent" />
+                    </div>
+
+                    <div className="p-6 md:p-8">
+                      <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[color:var(--color-gt-accent-green)]">
+                        {t("about.ibrahimRole")}
+                      </p>
+                      <h3 className="mt-2 font-[family-name:var(--font-display)] text-2xl font-bold text-[color:var(--color-gt-navy)]">
+                        {t("about.ibrahimName")}
+                      </h3>
+                      <p className="mt-1 text-sm font-medium text-slate-600">{t("about.ibrahimTitle")}</p>
+
+                      <div className="mt-5 space-y-4 text-sm leading-relaxed text-slate-700 md:text-base">
+                        <p>{t("about.ibrahimMessageP1")}</p>
+                        <p>{t("about.ibrahimMessageP2")}</p>
+                        <p>{t("about.ibrahimMessageP3")}</p>
+                        <p>{t("about.ibrahimMessageP4")}</p>
+                      </div>
+
+                      <div className="mt-6 border-t border-slate-200 pt-4">
+                        <p className="text-sm font-semibold text-[color:var(--color-gt-navy)]">{t("about.ibrahimSignName")}</p>
+                        <p className="text-xs uppercase tracking-wider text-slate-500">{t("about.ibrahimSignRole")}</p>
+                      </div>
+                    </div>
+                  </div>
+                </article>
+
+                <div className="grid gap-5 sm:grid-cols-2 2xl:grid-cols-3">
+                  <article className="group overflow-hidden rounded-3xl border border-slate-200/90 bg-white shadow-[0_6px_20px_rgba(15,23,42,0.06)] transition hover:-translate-y-0.5 hover:shadow-[0_14px_28px_rgba(15,23,42,0.12)]">
+                    <div className="relative aspect-[3/4] max-h-[430px] min-h-[320px]">
+                      <img
+                        src="/images/team/aboubaker-helaf.png"
+                        alt={t("about.aboubakerName")}
+                        className="h-full w-full object-cover object-top"
+                        loading="lazy"
+                      />
+                      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-slate-900/45 to-transparent" />
+                    </div>
+
+                    <div className="p-6">
+                      <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[color:var(--color-gt-accent-green)]">
+                        {t("about.aboubakerRole")}
+                      </p>
+                      <h3 className="mt-2 font-[family-name:var(--font-display)] text-xl font-bold text-[color:var(--color-gt-navy)]">
+                        {t("about.aboubakerName")}
+                      </h3>
+                      <p className="mt-3 text-sm leading-relaxed text-slate-600">{t("about.aboubakerBio")}</p>
+                    </div>
+                  </article>
+
+                  <article className="group overflow-hidden rounded-3xl border border-slate-200/90 bg-white shadow-[0_6px_20px_rgba(15,23,42,0.06)] transition hover:-translate-y-0.5 hover:shadow-[0_14px_28px_rgba(15,23,42,0.12)]">
+                    <div className="relative aspect-[3/4] max-h-[430px] min-h-[320px]">
+                      <img
+                        src="/images/team/moustafe-warsama-omar.png"
+                        alt={t("about.moustafeName")}
+                        className="h-full w-full object-cover object-top"
+                        loading="lazy"
+                      />
+                      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-slate-900/45 to-transparent" />
+                    </div>
+
+                    <div className="p-6">
+                      <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[color:var(--color-gt-accent-green)]">
+                        {t("about.moustafeRole")}
+                      </p>
+                      <h3 className="mt-2 font-[family-name:var(--font-display)] text-xl font-bold text-[color:var(--color-gt-navy)]">
+                        {t("about.moustafeName")}
+                      </h3>
+                      <p className="mt-3 text-sm leading-relaxed text-slate-600">{t("about.moustafeBio")}</p>
+                    </div>
+                  </article>
+
+                  <article className="group overflow-hidden rounded-3xl border border-slate-200/90 bg-white shadow-[0_6px_20px_rgba(15,23,42,0.06)] transition hover:-translate-y-0.5 hover:shadow-[0_14px_28px_rgba(15,23,42,0.12)]">
+                    <div className="relative aspect-[3/4] max-h-[430px] min-h-[320px]">
+                      <img
+                        src="/images/team/yousouf-haroun.png"
+                        alt={t("about.yousoufName")}
+                        className="h-full w-full object-cover object-top"
+                        loading="lazy"
+                      />
+                      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-slate-900/45 to-transparent" />
+                    </div>
+
+                    <div className="p-6">
+                      <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[color:var(--color-gt-accent-green)]">
+                        {t("about.yousoufRole")}
+                      </p>
+                      <h3 className="mt-2 font-[family-name:var(--font-display)] text-xl font-bold text-[color:var(--color-gt-navy)]">
+                        {t("about.yousoufName")}
+                      </h3>
+                      <p className="mt-3 text-sm leading-relaxed text-slate-600">{t("about.yousoufBio")}</p>
+                    </div>
+                  </article>
+                </div>
+              </div>
+            </div>
           </div>
 
-          <aside className="space-y-6 lg:col-span-4">
-            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <aside className="space-y-6 xl:col-span-4 2xl:col-span-3">
+            <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm xl:sticky xl:top-24">
               <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">{t("about.experienceKicker")}</p>
               <p className="mt-2 font-[family-name:var(--font-display)] text-4xl font-bold text-[color:var(--color-gt-navy)]">
                 {t("about.experienceYears")}
@@ -152,7 +269,7 @@ export function AboutPage() {
               </ul>
             </div>
 
-            <div className="rounded-2xl border border-slate-200 bg-slate-50/50 p-6">
+            <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
               <h3 className="font-[family-name:var(--font-display)] text-lg font-semibold text-[color:var(--color-gt-navy)]">
                 {t("about.asideMissionH3")}
               </h3>
