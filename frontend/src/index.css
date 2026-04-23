@@ -1,0 +1,54 @@
+@import "tailwindcss";
+
+@theme {
+  --font-display: "Playfair Display", ui-serif, Georgia, serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --color-gt-topbar: #1e2d24;
+  --color-gt-navy: #0a1628;
+  --color-gt-navy-deep: #050d1a;
+  --color-gt-blue: #0c2a5c;
+  --color-gt-accent-green: #2e7d57;
+  --color-gt-whatsapp: #25d366;
+  --color-gt-coral: #e53935;
+  --color-gt-gold: #c9a227;
+}
+
+body {
+  font-family: var(--font-sans);
+  color: var(--color-gt-navy);
+}
+
+/* Meilleur rendu des scripts arabes / éthiopiens */
+:lang(ar) {
+  font-family: "Segoe UI", "Noto Naskh Arabic", Tahoma, sans-serif;
+}
+:lang(am),
+:lang(om) {
+  font-family: "Noto Sans Ethiopic", "Segoe UI", sans-serif;
+}
+
+@keyframes gt-logo-marquee-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.gt-logo-marquee {
+  display: flex;
+  width: max-content;
+  align-items: center;
+  animation: gt-logo-marquee-scroll var(--gt-marquee-duration, 30s) linear infinite;
+}
+
+.group:hover .gt-logo-marquee {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gt-logo-marquee {
+    animation: none;
+  }
+}
