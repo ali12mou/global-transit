@@ -736,7 +736,6 @@ function InfrastructureTable({
     </div>
   );
 }
-
 function NewsTable({
   rows,
   onEdit,

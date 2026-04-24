@@ -82,7 +82,6 @@ publicRouter.get("/infrastructures", async (_req, res, next) => {
     next(e);
   }
 });
-
 publicRouter.get("/partners", async (_req, res, next) => {
   try {
     const items = await Partner.find().sort({ order: 1, createdAt: -1 });
