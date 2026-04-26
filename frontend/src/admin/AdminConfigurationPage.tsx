@@ -35,7 +35,8 @@ export function AdminConfigurationPage() {
       </h1>
       <p className="mt-2 text-sm text-slate-600">
         Clés/valeurs stockées en base. La clé <code className="rounded bg-slate-100 px-1">site</code> alimente le
-        texte de la page d&apos;accueil.
+        texte de la page d&apos;accueil et la clé <code className="rounded bg-slate-100 px-1">about</code> alimente la
+        page À propos.
       </p>
       <div className="mt-6 overflow-x-auto rounded-xl border border-slate-200 bg-white">
         <table className="min-w-full text-sm">
@@ -76,6 +77,7 @@ export function AdminConfigurationPage() {
           <div className="flex max-h-[90vh] w-full max-w-2xl flex-col rounded-2xl bg-white p-6 shadow-xl">
             <h2 className="text-lg font-semibold">Éditer — {editKey}</h2>
             <textarea
+              aria-label={`Éditer la configuration ${editKey}`}
               className="mt-4 min-h-[320px] flex-1 rounded-lg border border-slate-300 p-3 font-mono text-sm"
               value={jsonText}
               onChange={(e) => setJsonText(e.target.value)}

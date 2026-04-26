@@ -169,6 +169,7 @@ export const entityModules: EntityModule[] = [
     title: "Équipe",
     api: "/api/admin/team",
     fields: [
+      { key: "order", label: "Ordre", type: "number" },
       { key: "title", label: "Titre", type: "text" },
       { key: "name", label: "Nom", type: "text" },
       { key: "description", label: "Description", type: "textarea" },

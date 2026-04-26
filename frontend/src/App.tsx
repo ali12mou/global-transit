@@ -12,6 +12,7 @@ import { AdminModulePage } from "./admin/AdminModulePage";
 import { AdminUsersPage } from "./admin/AdminUsersPage";
 import { AdminConfigurationPage } from "./admin/AdminConfigurationPage";
 import { AdminContactsPage } from "./admin/AdminContactsPage";
+import { AdminAboutPage } from "./admin/AdminAboutPage";
 import { entityModules } from "./admin/entityModules";
 import { ActivitiesPage } from "./pages/ActivitiesPage";
 import { ProjectsPage } from "./pages/ProjectsPage";
@@ -48,6 +49,7 @@ export function App() {
       >
         <Route index element={<AdminDashboard />} />
         <Route path="users" element={<AdminUsersPage />} />
+        <Route path="about" element={<AdminAboutPage />} />
         <Route path="configuration" element={<AdminConfigurationPage />} />
         <Route path="contacts" element={<AdminContactsPage />} />
         {entityModules.map((m) => (

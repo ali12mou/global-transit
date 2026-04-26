@@ -311,7 +311,7 @@ mountCrud(adminRouter, "careers", "career", Career);
 mountCrud(adminRouter, "clients", "clients", Client, { sort: { order: 1 } });
 mountCrud(adminRouter, "infrastructures", "infrastructure", Infrastructure, { sort: { order: 1 } });
 mountCrud(adminRouter, "partners", "partners", Partner, { sort: { order: 1 } });
-mountCrud(adminRouter, "team", "team", Team, { sort: { createdAt: -1 } });
+mountCrud(adminRouter, "team", "team", Team, { sort: { order: 1, createdAt: -1 } });
 mountCrud(adminRouter, "projects", "projects", Project, { prepareCreate: slugFromTitle });
 mountCrud(adminRouter, "news", "news", News, { prepareCreate: prepareNews });
 

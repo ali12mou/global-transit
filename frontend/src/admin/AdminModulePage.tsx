@@ -596,10 +596,11 @@ function TeamTable({
   return (
     <div className="mt-6 overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-[0_1px_3px_rgba(15,23,42,0.08)]">
       <div className="overflow-x-auto">
-        <table className="min-w-[920px] w-full border-collapse text-left text-sm">
+        <table className="min-w-[980px] w-full border-collapse text-left text-sm">
           <thead>
             <tr className="border-b border-slate-200 bg-gradient-to-b from-slate-50 to-slate-100/90">
-              <th className="px-4 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-500">ID</th>
+              <th className="px-4 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-500">Photo</th>
+              <th className="px-3 py-3.5 text-center text-xs font-semibold uppercase tracking-wider text-slate-500">Ordre</th>
               <th className="px-4 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-500">Titre</th>
               <th className="px-4 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-500">Nom</th>
               <th className="px-4 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-500">Description</th>
@@ -611,8 +612,19 @@ function TeamTable({
           <tbody className="divide-y divide-slate-100">
             {rows.map((row) => (
               <tr key={row._id} className="transition-colors hover:bg-slate-50/90">
-                <td className="max-w-[170px] truncate px-4 py-3 align-middle">
-                  <code className="text-xs text-slate-600">{row._id}</code>
+                <td className="px-4 py-3 align-middle">
+                  <div className="flex h-14 w-14 items-center justify-center overflow-hidden rounded-full bg-slate-100 ring-1 ring-slate-200/80">
+                    {String(row.imageUrl ?? "").trim() ? (
+                      <img src={String(row.imageUrl)} alt="" className="h-full w-full object-cover" loading="lazy" />
+                    ) : (
+                      <span className="text-[10px] text-slate-400">—</span>
+                    )}
+                  </div>
+                </td>
+                <td className="px-3 py-3 text-center align-middle">
+                  <span className="inline-flex min-w-[2rem] items-center justify-center rounded-md bg-slate-100 px-2 py-1 text-xs font-semibold tabular-nums text-slate-700">
+                    {String(row.order ?? 0)}
+                  </span>
                 </td>
                 <td className="max-w-[160px] truncate px-4 py-3 align-middle text-slate-700">{String(row.title ?? "") || "—"}</td>
                 <td className="max-w-[180px] truncate px-4 py-3 align-middle font-semibold text-[color:var(--color-gt-navy)]">
@@ -1024,6 +1036,7 @@ function FieldControl({ field, defaults }: { field: FieldDef; defaults: Record<s
         <label className="text-sm font-medium text-slate-700">{field.label}</label>
         <select
           name={field.key}
+          aria-label={field.label}
           required
           className="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm shadow-inner focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-100"
           defaultValue={dv || opts[0] || ""}
@@ -1045,6 +1058,7 @@ function FieldControl({ field, defaults }: { field: FieldDef; defaults: Record<s
           <input
             name={field.key}
             type="checkbox"
+            aria-label={field.label}
             className="size-4 rounded border-slate-300 text-teal-600 focus:ring-[color:var(--color-gt-blue)]"
             defaultChecked={Boolean(defaults[field.key])}
           />
@@ -1060,6 +1074,7 @@ function FieldControl({ field, defaults }: { field: FieldDef; defaults: Record<s
       {field.type === "textarea" ? (
         <textarea
           name={field.key}
+          aria-label={field.label}
           className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm shadow-inner"
           rows={4}
           defaultValue={dv}
@@ -1067,6 +1082,7 @@ function FieldControl({ field, defaults }: { field: FieldDef; defaults: Record<s
       ) : (
         <input
           name={field.key}
+          aria-label={field.label}
           type={field.type === "number" ? "number" : field.type === "datetime-local" ? "datetime-local" : "text"}
           className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm shadow-inner"
           defaultValue={dv || undefined}

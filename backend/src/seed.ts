@@ -8,6 +8,7 @@ import { ActivityService } from "./models/ActivityService.js";
 import { Project } from "./models/Project.js";
 import { Partner } from "./models/Partner.js";
 import { Client } from "./models/Client.js";
+import { Team } from "./models/Team.js";
 
 const MONGODB_URI = process.env.MONGODB_URI ?? "mongodb://127.0.0.1:27017/globaltransit";
 
@@ -53,6 +54,37 @@ async function seed() {
 
   const siteDefaults: { key: string; value: unknown }[] = [
     {
+      key: "about",
+      value: {
+        kicker: "À propos",
+        title: "Qui sommes-nous ?",
+        intro:
+          "Global Transit and Transport Service est un partenaire stratégique en transit, logistique et dédouanement entre Djibouti, l'Éthiopie et l'Afrique de l'Est.",
+        cardTitle: "Global Transit and Transport Service",
+        cardText:
+          "Une équipe expérimentée, des opérations sécurisées et une maîtrise complète du corridor Djibouti - Éthiopie.",
+        cardCheck: "Conformité, rapidité d'exécution et accompagnement dédié.",
+        missionH2: "Notre mission",
+        missionP1:
+          "Nous facilitons vos opérations d'import-export grâce à des solutions de transit fiables, transparentes et adaptées à chaque cargaison.",
+        missionP2:
+          "Notre objectif est d'offrir un service durable, avec un haut niveau de qualité opérationnelle et un suivi client continu.",
+        strengthsTitle: "Nos points forts",
+        standardsBadge: "Standards",
+        servicesH2: "Nos services",
+        expertsH2: "Notre équipe d'experts",
+        expertsBadge: "Professionnels certifiés",
+        experienceKicker: "Expérience",
+        experienceYears: "15+",
+        experienceText:
+          "Plus de 15 ans d'expérience dans les opérations de transit et de logistique sur le corridor Djibouti - Éthiopie.",
+        asideMissionH3: "Engagement qualité",
+        asideMissionText:
+          "Nous mettons en place des procédures de contrôle et des indicateurs de performance pour garantir la fiabilité de chaque opération.",
+        contactCta: "Parler à notre équipe",
+      },
+    },
+    {
       key: "site",
       value: {
         heroTag: "GLOBAL TRANSIT AND TRANSPORT SERVICES",
@@ -73,6 +105,8 @@ async function seed() {
   for (const row of siteDefaults) {
     await Configuration.findOneAndUpdate({ key: row.key }, { key: row.key, value: row.value }, { upsert: true });
   }
+
+  await Team.updateMany({ order: { $exists: false } }, { $set: { order: 0 } });
 
   const servicesCount = await ActivityService.countDocuments();
   if (servicesCount === 0) {
