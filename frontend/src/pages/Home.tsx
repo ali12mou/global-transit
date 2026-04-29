@@ -479,14 +479,24 @@ export function Home() {
                 durationSec={28}
                 renderItem={(infra) => {
                   return (
-                    <div className="mx-3 flex min-h-[100px] min-w-[220px] flex-col items-center justify-center rounded-xl border border-slate-200 bg-white px-5 py-3 text-center shadow-sm">
-                      {infra.imageUrl ? (
-                        <img src={infra.imageUrl} alt={infra.name} className="max-h-12 max-w-[130px] object-contain" />
-                      ) : null}
-                      <span className="mt-2 text-sm font-semibold text-slate-700">{infra.name}</span>
-                      {infra.description ? (
-                        <span className="mt-1 line-clamp-2 text-xs text-slate-500">{infra.description}</span>
-                      ) : null}
+                    <div className="mx-3 flex h-[300px] w-[340px] shrink-0 flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white text-left shadow-sm">
+                      <div className="relative aspect-[16/9] w-full bg-slate-100">
+                        {infra.imageUrl ? (
+                          <img src={infra.imageUrl} alt={infra.name} className="h-full w-full object-cover" />
+                        ) : (
+                          <div className="flex h-full w-full items-center justify-center text-sm text-slate-400">
+                            {t("home.imagePlaceholder")}
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex h-[108px] flex-col p-4">
+                        <span className="line-clamp-1 text-base font-semibold text-[color:var(--color-gt-navy)]">
+                          {infra.name}
+                        </span>
+                        {infra.description ? (
+                          <span className="mt-2 line-clamp-2 text-sm text-slate-600">{infra.description}</span>
+                        ) : null}
+                      </div>
                     </div>
                   );
                 }}

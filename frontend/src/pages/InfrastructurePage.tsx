@@ -32,9 +32,9 @@ export function InfrastructurePage() {
           )}
           <ul className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {infrastructures.map((item) => (
-              <li key={item._id}>
-                <article className="h-full overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-                  <div className="relative aspect-[16/10] bg-slate-100">
+              <li key={item._id} className="flex justify-center">
+                <article className="flex h-[320px] w-full max-w-[360px] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+                  <div className="relative aspect-[16/9] bg-slate-100">
                     {item.imageUrl ? (
                       <img src={item.imageUrl} alt={item.name} className="h-full w-full object-cover" />
                     ) : (
@@ -43,11 +43,11 @@ export function InfrastructurePage() {
                       </div>
                     )}
                   </div>
-                  <div className="p-5">
-                    <h3 className="font-[family-name:var(--font-display)] text-xl text-[color:var(--color-gt-navy)]">
+                  <div className="flex h-[120px] flex-col p-5">
+                    <h3 className="line-clamp-1 font-[family-name:var(--font-display)] text-xl text-[color:var(--color-gt-navy)]">
                       {item.name}
                     </h3>
-                    <p className="mt-2 text-sm text-slate-600">{item.description || "—"}</p>
+                    <p className="mt-2 line-clamp-3 text-sm text-slate-600">{item.description || "—"}</p>
                   </div>
                 </article>
               </li>
