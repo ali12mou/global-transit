@@ -42,6 +42,9 @@ type AboutConfig = {
   asideMissionH3?: string;
   asideMissionText?: string;
   contactCta?: string;
+  teamEmptyText?: string;
+  teamFallbackTitle?: string;
+  teamFallbackDescription?: string;
   strengths?: string[];
   services?: Array<{ title?: string; text?: string }>;
 };
@@ -202,7 +205,7 @@ export function AboutPage() {
               <div className="grid gap-5 sm:grid-cols-2 2xl:grid-cols-3">
                 {team.length === 0 ? (
                   <p className="col-span-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-6 text-center text-slate-600">
-                    {t("publicPages.noContent")}
+                    {about.teamEmptyText ?? t("publicPages.noContent")}
                   </p>
                 ) : (
                   team.map((member, index) => (
@@ -225,7 +228,7 @@ export function AboutPage() {
                       <div className="p-6">
                         <div className="mb-2 flex items-center justify-between gap-2">
                           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[color:var(--color-gt-accent-green)]">
-                            {member.title || "TEAM"}
+                            {member.title || about.teamFallbackTitle || "TEAM"}
                           </p>
                           <span className="rounded-full border border-slate-200 bg-white px-2 py-0.5 text-[10px] font-bold text-slate-500">
                             #{member.order ?? index + 1}
@@ -234,7 +237,9 @@ export function AboutPage() {
                         <h3 className="mt-2 font-[family-name:var(--font-display)] text-xl font-bold text-[color:var(--color-gt-navy)]">
                           {member.name}
                         </h3>
-                        <p className="mt-3 text-sm leading-relaxed text-slate-600">{member.description || "—"}</p>
+                        <p className="mt-3 text-sm leading-relaxed text-slate-600">
+                          {member.description || about.teamFallbackDescription || "—"}
+                        </p>
                       </div>
                     </article>
                   ))

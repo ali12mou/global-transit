@@ -51,7 +51,7 @@ function partnerTypeI18nKey(typeKey: string): "Ports" | "FREE_ZONE" | "AGENCE" {
   if (typeKey === "AGENCE") return "AGENCE";
   return "Ports";
 }
-type Infrastructure = { _id: string; name: string; description: string; imageUrl: string };
+type Infrastructure = { _id: string; name: string; imageUrl: string };
 type Project = {
   _id: string;
   title: string;
@@ -493,9 +493,6 @@ export function Home() {
                         <span className="line-clamp-1 text-base font-semibold text-[color:var(--color-gt-navy)]">
                           {infra.name}
                         </span>
-                        {infra.description ? (
-                          <span className="mt-2 line-clamp-2 text-sm text-slate-600">{infra.description}</span>
-                        ) : null}
                       </div>
                     </div>
                   );

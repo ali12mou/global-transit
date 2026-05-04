@@ -25,6 +25,9 @@ type AboutConfig = {
   asideMissionH3?: string;
   asideMissionText?: string;
   contactCta?: string;
+  teamEmptyText?: string;
+  teamFallbackTitle?: string;
+  teamFallbackDescription?: string;
   strengths?: string[];
   services?: Array<{ title?: string; text?: string }>;
 };
@@ -50,6 +53,9 @@ type AboutForm = {
   asideMissionH3: string;
   asideMissionText: string;
   contactCta: string;
+  teamEmptyText: string;
+  teamFallbackTitle: string;
+  teamFallbackDescription: string;
   strengthsText: string;
   servicesText: string;
 };
@@ -78,6 +84,9 @@ function normalizeToForm(raw: AboutConfig): AboutForm {
     asideMissionH3: raw.asideMissionH3 ?? "",
     asideMissionText: raw.asideMissionText ?? "",
     contactCta: raw.contactCta ?? "",
+    teamEmptyText: raw.teamEmptyText ?? "",
+    teamFallbackTitle: raw.teamFallbackTitle ?? "",
+    teamFallbackDescription: raw.teamFallbackDescription ?? "",
     strengthsText: strengths.join("\n"),
     servicesText: services
       .map((s) => `${String(s.title ?? "").trim()}|${String(s.text ?? "").trim()}`)
@@ -121,6 +130,9 @@ function formToPayload(form: AboutForm): AboutConfig {
     asideMissionH3: form.asideMissionH3.trim(),
     asideMissionText: form.asideMissionText.trim(),
     contactCta: form.contactCta.trim(),
+    teamEmptyText: form.teamEmptyText.trim(),
+    teamFallbackTitle: form.teamFallbackTitle.trim(),
+    teamFallbackDescription: form.teamFallbackDescription.trim(),
     strengths,
     services,
   };
@@ -218,6 +230,23 @@ export function AdminAboutPage() {
           <TextField label="Equipe - titre" value={form.expertsH2} onChange={(v) => setField("expertsH2", v)} />
           <TextField label="Equipe - badge" value={form.expertsBadge} onChange={(v) => setField("expertsBadge", v)} />
         </div>
+        <div className="grid gap-4 md:grid-cols-2">
+          <TextField
+            label="Equipe vide - message"
+            value={form.teamEmptyText}
+            onChange={(v) => setField("teamEmptyText", v)}
+          />
+          <TextField
+            label="Equipe - role par defaut"
+            value={form.teamFallbackTitle}
+            onChange={(v) => setField("teamFallbackTitle", v)}
+          />
+        </div>
+        <TextField
+          label="Equipe - description par defaut"
+          value={form.teamFallbackDescription}
+          onChange={(v) => setField("teamFallbackDescription", v)}
+        />
 
         <div className="grid gap-4 md:grid-cols-3">
           <TextField

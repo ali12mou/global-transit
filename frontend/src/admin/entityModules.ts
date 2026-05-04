@@ -99,7 +99,6 @@ export const entityModules: EntityModule[] = [
     api: "/api/admin/infrastructures",
     fields: [
       { key: "name", label: "Nom", type: "text" },
-      { key: "description", label: "Description", type: "textarea" },
       {
         key: "imageUrl",
         label: "Image",

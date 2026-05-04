@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { apiFetch } from "@/api/client";
 
-type Infrastructure = { _id: string; name: string; description?: string; imageUrl?: string; order?: number };
+type Infrastructure = { _id: string; name: string; imageUrl?: string; order?: number };
 
 export function InfrastructurePage() {
   const { t } = useTranslation();
@@ -47,7 +47,6 @@ export function InfrastructurePage() {
                     <h3 className="line-clamp-1 font-[family-name:var(--font-display)] text-xl text-[color:var(--color-gt-navy)]">
                       {item.name}
                     </h3>
-                    <p className="mt-2 line-clamp-3 text-sm text-slate-600">{item.description || "—"}</p>
                   </div>
                 </article>
               </li>
