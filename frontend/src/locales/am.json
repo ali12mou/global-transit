@@ -4,6 +4,8 @@
     "activities": "እንቅስቃሮቻችን",
     "projects": "ፕሮጀክቶቻችን",
     "clients": "ደንበኞቻችን",
+    "team": "ቡድናችን",
+    "infrastructure": "መሠረተ ልማት",
     "news": "ዜና",
     "contact": "ያግኙን"
   },
@@ -155,7 +157,9 @@
     "experienceText": "በሎጂስቲክስ፣ ትራንዚት እና የጉምሩክ ቅንጅት ጠንካራ ልምድ።",
     "asideMissionH3": "ተልዕኳችን",
     "asideMissionText": "በጂቡቲ በአውሮፓ፣ እስያ እና ምዕራብ አፍሪካ መካከል ለፍሰቶችዎ አስተማማኝ እና ግልጽ ሎጂስቲክስ መፍትሄዎች።",
-    "contactCta": "ያግኙን →"
+    "contactCta": "ያግኙን →",
+    "readMore": "ተጨማሪ ያንብቡ",
+    "readLess": "አሳጥር"
   },
   "contact": {
     "kicker": "ያግኙን",

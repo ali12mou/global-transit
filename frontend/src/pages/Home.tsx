@@ -479,7 +479,7 @@ export function Home() {
                 durationSec={28}
                 renderItem={(infra) => {
                   return (
-                    <div className="mx-3 flex h-[300px] w-[340px] shrink-0 flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white text-left shadow-sm">
+                    <div className="mx-2 flex w-[78vw] max-w-[340px] min-w-[240px] shrink-0 flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white text-left shadow-sm sm:mx-3 sm:w-[300px]">
                       <div className="relative aspect-[16/9] w-full bg-slate-100">
                         {infra.imageUrl ? (
                           <img src={infra.imageUrl} alt={infra.name} className="h-full w-full object-cover" />
@@ -489,8 +489,8 @@ export function Home() {
                           </div>
                         )}
                       </div>
-                      <div className="flex h-[108px] flex-col p-4">
-                        <span className="line-clamp-1 text-base font-semibold text-[color:var(--color-gt-navy)]">
+                      <div className="flex min-h-[92px] flex-col p-4 sm:min-h-[108px]">
+                        <span className="line-clamp-2 break-words text-base font-semibold text-[color:var(--color-gt-navy)]">
                           {infra.name}
                         </span>
                       </div>

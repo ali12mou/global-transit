@@ -18,6 +18,7 @@ export function Header() {
   const nav = useMemo(
     () => [
       { to: "/a-propos", label: t("nav.about") },
+      { to: "/equipe", label: t("nav.team") },
       { to: "/activites", label: t("nav.activities") },
       { to: "/projets", label: t("nav.projects") },
       { to: "/infrastructures", label: t("nav.infrastructure") },
@@ -48,7 +49,7 @@ export function Header() {
           <a
             href="https://wa.me/25377696130"
             target="_blank"
-            rel="noreferrer"
+            rel="noopener noreferrer"
             className="inline-flex items-center gap-2 rounded-full bg-[color:var(--color-gt-whatsapp)] px-4 py-1.5 text-sm font-medium text-white hover:brightness-110"
           >
             <FaWhatsapp className="text-lg" />

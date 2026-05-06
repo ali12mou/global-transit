@@ -49,7 +49,7 @@ export function AdminUsersPage() {
           Nouvel utilisateur
         </button>
       </div>
-      <div className="mt-6 overflow-x-auto rounded-xl border border-slate-200 bg-white">
+      <div className="mt-6 hidden overflow-x-auto rounded-xl border border-slate-200 bg-white md:block">
         <table className="min-w-full text-sm">
           <thead className="bg-slate-50 text-slate-600">
             <tr>
@@ -69,6 +69,19 @@ export function AdminUsersPage() {
           </tbody>
         </table>
       </div>
+      <div className="mt-6 space-y-3 md:hidden">
+        {users.map((u) => (
+          <article key={u._id} className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+            <p className="break-all text-sm font-semibold text-slate-800">{u.email}</p>
+            <p className="mt-2 text-xs text-slate-500">
+              Rôle: <span className="font-medium text-slate-700">{typeof u.roleId === "object" ? u.roleId.name : u.roleId}</span>
+            </p>
+            <p className="mt-1 text-xs text-slate-500">
+              Statut: <span className="font-medium text-slate-700">{u.active ? "Actif" : "Inactif"}</span>
+            </p>
+          </article>
+        ))}
+      </div>
 
       {open && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
@@ -87,16 +100,28 @@ export function AdminUsersPage() {
           >
             <h2 className="text-lg font-semibold">Nouvel utilisateur</h2>
             <label className="mt-4 block text-sm font-medium">Email</label>
-            <input name="email" type="email" required className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2" />
+            <input
+              name="email"
+              aria-label="Email utilisateur"
+              type="email"
+              required
+              className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2"
+            />
             <label className="mt-3 block text-sm font-medium">Mot de passe</label>
             <input
               name="password"
+              aria-label="Mot de passe utilisateur"
               type="password"
               required
               className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2"
             />
             <label className="mt-3 block text-sm font-medium">Rôle</label>
-            <select name="roleId" required className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2">
+            <select
+              name="roleId"
+              aria-label="Rôle utilisateur"
+              required
+              className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2"
+            >
               {roles.map((r) => (
                 <option key={r._id} value={r._id}>
                   {r.name}

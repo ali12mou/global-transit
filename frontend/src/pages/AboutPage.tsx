@@ -2,6 +2,7 @@ import { FaCheck } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 import {
   IoChatbubblesOutline,
   IoDocumentTextOutline,
@@ -75,6 +76,7 @@ const serviceCardKeys = [
 
 export function AboutPage() {
   const { t } = useTranslation();
+  const [expandedTeamCards, setExpandedTeamCards] = useState<Record<string, boolean>>({});
   const { data: team = [] } = useQuery({
     queryKey: ["team"],
     queryFn: () => apiFetch<TeamMember[]>("/api/team", { auth: false }),
@@ -95,93 +97,110 @@ export function AboutPage() {
         text: t(`about.${s.text}`),
       }));
 
+  function toggleTeamDetails(memberId: string) {
+    setExpandedTeamCards((prev) => ({ ...prev, [memberId]: !prev[memberId] }));
+  }
+
   return (
-    <div className="bg-slate-50/60">
-      <section className="border-b border-slate-200/80 bg-gradient-to-b from-white to-slate-50/70">
-        <div className="mx-auto w-full max-w-[1440px] px-4 py-12 sm:px-6 md:py-16 lg:px-8 xl:px-10 2xl:py-20">
-          <div className="grid gap-8 lg:grid-cols-12 lg:items-start xl:gap-12">
-            <div className="lg:col-span-7 xl:col-span-8">
-              <p className="text-xs font-bold uppercase tracking-[0.2em] text-[color:var(--color-gt-accent-green)]">
-                {about.kicker ?? t("about.kicker")}
-              </p>
-              <h1 className="mt-3 font-[family-name:var(--font-display)] text-3xl font-bold leading-tight text-[color:var(--color-gt-navy)] md:text-4xl lg:text-[2.65rem]">
-                {about.title ?? t("about.title")}
-              </h1>
-              <p className="mt-6 max-w-2xl text-base leading-relaxed text-slate-600 md:text-lg">
-                {about.intro ?? t("about.intro")}
-              </p>
-            </div>
-            <div className="lg:col-span-5 xl:col-span-4">
-              <div className="rounded-3xl border border-slate-200/90 bg-white/90 p-5 shadow-[0_10px_28px_rgba(15,23,42,0.07)] sm:p-6 lg:sticky lg:top-24">
-                <div className="flex flex-col items-start gap-4 sm:flex-row">
-                  <div className="shrink-0 rounded-xl bg-white p-2 shadow-sm ring-1 ring-slate-200/80">
-                    <Logo variant="header" className="max-w-[240px] sm:max-w-[260px]" />
-                  </div>
-                  <div>
-                    <p className="font-semibold text-[color:var(--color-gt-navy)]">{about.cardTitle ?? t("about.cardTitle")}</p>
-                    <p className="mt-2 text-sm leading-relaxed text-slate-600">{about.cardText ?? t("about.cardText")}</p>
-                  </div>
-                </div>
-                <div className="mt-5 flex items-start gap-2 border-t border-slate-200/80 pt-5">
-                  <FaCheck className="mt-0.5 shrink-0 text-[color:var(--color-gt-accent-green)]" />
-                  <p className="text-sm text-slate-600">{about.cardCheck ?? t("about.cardCheck")}</p>
-                </div>
-              </div>
-            </div>
-          </div>
+    <div className="bg-slate-50">
+      <section className="relative overflow-hidden border-b border-slate-200 bg-[color:var(--color-gt-navy)] text-white">
+        <div
+          className="absolute inset-0 bg-cover bg-center"
+          style={{ backgroundImage: "url('/images/hero/hero-4.png')" }}
+        />
+        <div className="absolute inset-0 bg-[linear-gradient(105deg,rgba(4,10,20,0.88)_0%,rgba(4,10,20,0.8)_45%,rgba(4,10,20,0.68)_100%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(34,197,94,0.16),transparent_46%),radial-gradient(circle_at_15%_80%,rgba(56,189,248,0.14),transparent_42%)]" />
+        <div className="relative mx-auto w-full max-w-[1440px] px-4 py-14 sm:px-6 md:py-16 lg:px-8 xl:px-10">
+          <p className="text-xs font-bold uppercase tracking-[0.24em] text-emerald-200">
+            {about.kicker ?? t("about.kicker")}
+          </p>
+          <h1 className="mt-4 max-w-3xl font-[family-name:var(--font-display)] text-3xl font-bold leading-tight md:text-5xl">
+            {about.title ?? t("about.title")}
+          </h1>
+          <p className="mt-5 max-w-2xl text-base leading-relaxed text-slate-200 md:text-lg">
+            {about.intro ?? t("about.intro")}
+          </p>
         </div>
       </section>
 
-      <section className="mx-auto w-full max-w-[1440px] px-4 py-12 sm:px-6 md:py-14 lg:px-8 xl:px-10 2xl:py-16">
-        <div className="grid gap-8 xl:grid-cols-12 xl:gap-10">
-          <div className="space-y-8 xl:col-span-8 2xl:col-span-9">
-            <div className="rounded-3xl border border-slate-200/80 bg-white p-5 shadow-[0_8px_24px_rgba(15,23,42,0.05)] sm:p-6 lg:p-8">
-              <h2 className="font-[family-name:var(--font-display)] text-2xl font-bold text-[color:var(--color-gt-navy)] md:text-3xl">
+      <section className="mx-auto w-full max-w-[1440px] px-4 py-10 sm:px-6 md:py-14 lg:px-8 xl:px-10">
+        <div className="grid gap-6 lg:grid-cols-12">
+          <article className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm lg:col-span-8">
+            <div className="flex flex-col items-start gap-5 md:flex-row md:items-center">
+              <div className="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm">
+                <Logo variant="header" className="max-w-[260px]" />
+              </div>
+              <div>
+                <h2 className="font-[family-name:var(--font-display)] text-2xl text-[color:var(--color-gt-navy)]">
+                  {about.cardTitle ?? t("about.cardTitle")}
+                </h2>
+                <p className="mt-2 text-slate-600">{about.cardText ?? t("about.cardText")}</p>
+              </div>
+            </div>
+            <div className="mt-5 inline-flex items-start gap-2 rounded-xl bg-emerald-50 px-4 py-3 text-sm text-emerald-900 ring-1 ring-emerald-100">
+              <FaCheck className="mt-0.5 shrink-0" />
+              <span>{about.cardCheck ?? t("about.cardCheck")}</span>
+            </div>
+          </article>
+
+          <aside className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm lg:col-span-4">
+            <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+              {about.experienceKicker ?? t("about.experienceKicker")}
+            </p>
+            <p className="mt-2 font-[family-name:var(--font-display)] text-5xl font-bold text-[color:var(--color-gt-navy)]">
+              {about.experienceYears ?? t("about.experienceYears")}
+            </p>
+            <p className="mt-3 text-sm leading-relaxed text-slate-600">
+              {about.experienceText ?? t("about.experienceText")}
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <section className="mx-auto w-full max-w-[1440px] px-4 pb-14 sm:px-6 lg:px-8 xl:px-10">
+        <div className="grid gap-6 lg:grid-cols-12">
+          <div className="space-y-6 lg:col-span-8">
+            <article id="team-section" className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm md:p-8">
+              <h2 className="font-[family-name:var(--font-display)] text-3xl font-bold text-[color:var(--color-gt-navy)]">
                 {about.missionH2 ?? t("about.missionH2")}
               </h2>
-              <div className="mt-4 space-y-4 text-slate-600 leading-relaxed">
+              <div className="mt-5 space-y-4 text-base leading-relaxed text-slate-600">
                 <p>{about.missionP1 ?? t("about.missionP1")}</p>
                 <p>{about.missionP2 ?? t("about.missionP2")}</p>
               </div>
+            </article>
 
-              <div className="mt-8 rounded-2xl border border-slate-200 bg-slate-50/60 p-4 sm:p-5">
-                <div className="mb-4 flex items-center justify-between gap-3">
-                  <h3 className="font-[family-name:var(--font-display)] text-lg font-semibold text-[color:var(--color-gt-navy)]">
-                    {about.strengthsTitle ?? t("about.strengthsTitle")}
-                  </h3>
-                  <span className="rounded-full bg-emerald-50 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-emerald-800 ring-1 ring-emerald-100">
-                    {about.standardsBadge ?? t("about.standardsBadge")}
-                  </span>
-                </div>
-                <div className="grid gap-3 sm:grid-cols-2">
-                  {strengths.map((label, idx) => {
-                    const Icon = strengthIcons[idx % strengthIcons.length]!;
-                    return (
-                      <div
-                        key={`${label}-${idx}`}
-                        className="flex items-center gap-3 rounded-xl border border-slate-100 bg-slate-50/60 px-4 py-3"
-                      >
-                        <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-white text-[color:var(--color-gt-accent-green)] shadow-sm ring-1 ring-slate-100">
-                          <Icon className="h-5 w-5" aria-hidden />
-                        </span>
-                        <span className="text-sm font-medium text-slate-800">{label}</span>
-                      </div>
-                    );
-                  })}
-                </div>
+            <article className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm md:p-8">
+              <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+                <h2 className="font-[family-name:var(--font-display)] text-2xl font-bold text-[color:var(--color-gt-navy)]">
+                  {about.strengthsTitle ?? t("about.strengthsTitle")}
+                </h2>
+                <span className="rounded-full bg-emerald-50 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-emerald-800 ring-1 ring-emerald-100">
+                  {about.standardsBadge ?? t("about.standardsBadge")}
+                </span>
               </div>
-            </div>
+              <div className="grid gap-3 sm:grid-cols-2">
+                {strengths.map((label, idx) => {
+                  const Icon = strengthIcons[idx % strengthIcons.length]!;
+                  return (
+                    <div key={`${label}-${idx}`} className="flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
+                      <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-white text-[color:var(--color-gt-accent-green)] shadow-sm ring-1 ring-slate-200">
+                        <Icon className="h-5 w-5" aria-hidden />
+                      </span>
+                      <span className="text-sm font-medium text-slate-700">{label}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            </article>
 
-            <div className="rounded-3xl border border-slate-200/80 bg-white p-5 shadow-[0_8px_24px_rgba(15,23,42,0.05)] sm:p-6 lg:p-8">
-              <h2 className="font-[family-name:var(--font-display)] text-2xl font-bold text-[color:var(--color-gt-navy)] md:text-3xl">
+            <article className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm md:p-8">
+              <h2 className="font-[family-name:var(--font-display)] text-2xl font-bold text-[color:var(--color-gt-navy)]">
                 {about.servicesH2 ?? t("about.servicesH2")}
               </h2>
-              <div className="mt-6 grid gap-4 sm:grid-cols-2 2xl:grid-cols-3">
+              <div className="mt-6 grid gap-4 md:grid-cols-2">
                 {serviceCards.map((s, idx) => (
-                  <div
-                    key={`${s.title}-${idx}`}
-                    className="rounded-2xl border border-slate-200/90 bg-white p-5 shadow-sm transition hover:border-slate-300/90 hover:shadow-md"
-                  >
+                  <div key={`${s.title}-${idx}`} className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
                     <div className="mb-3 h-1 w-10 rounded-full bg-[color:var(--color-gt-accent-green)]/80" />
                     <h3 className="font-[family-name:var(--font-display)] text-lg font-semibold text-[color:var(--color-gt-navy)]">
                       {s.title}
@@ -190,11 +209,11 @@ export function AboutPage() {
                   </div>
                 ))}
               </div>
-            </div>
+            </article>
 
-            <div className="rounded-3xl border border-slate-200/80 bg-white p-5 shadow-[0_8px_24px_rgba(15,23,42,0.05)] sm:p-6 lg:p-8">
+            <article className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm md:p-8">
               <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
-                <h2 className="font-[family-name:var(--font-display)] text-2xl font-bold text-[color:var(--color-gt-navy)] md:text-3xl">
+                <h2 className="font-[family-name:var(--font-display)] text-2xl font-bold text-[color:var(--color-gt-navy)]">
                   {about.expertsH2 ?? t("about.expertsH2")}
                 </h2>
                 <span className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-600">
@@ -202,81 +221,86 @@ export function AboutPage() {
                 </span>
               </div>
 
-              <div className="grid gap-5 sm:grid-cols-2 2xl:grid-cols-3">
+              <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
                 {team.length === 0 ? (
                   <p className="col-span-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-6 text-center text-slate-600">
                     {about.teamEmptyText ?? t("publicPages.noContent")}
                   </p>
                 ) : (
                   team.map((member, index) => (
-                    <article
-                      key={member._id}
-                      className="group relative overflow-hidden rounded-3xl border border-slate-200/90 bg-gradient-to-b from-white to-slate-50/80 shadow-[0_6px_20px_rgba(15,23,42,0.06)] transition hover:-translate-y-0.5 hover:shadow-[0_14px_28px_rgba(15,23,42,0.12)]"
-                    >
-                      <div className="pointer-events-none absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-[color:var(--color-gt-blue)] via-[color:var(--color-gt-accent-green)] to-[color:var(--color-gt-blue)]" />
-                      {member.imageUrl ? (
-                        <div className="relative aspect-[4/5] max-h-[400px] min-h-[280px]">
-                          <img
-                            src={member.imageUrl}
-                            alt={member.name}
-                            className="h-full w-full object-cover object-top transition duration-500 group-hover:scale-[1.03]"
-                            loading="lazy"
-                          />
-                          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-slate-900/45 to-transparent" />
-                        </div>
-                      ) : null}
-                      <div className="p-6">
-                        <div className="mb-2 flex items-center justify-between gap-2">
-                          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[color:var(--color-gt-accent-green)]">
-                            {member.title || about.teamFallbackTitle || "TEAM"}
-                          </p>
-                          <span className="rounded-full border border-slate-200 bg-white px-2 py-0.5 text-[10px] font-bold text-slate-500">
-                            #{member.order ?? index + 1}
-                          </span>
-                        </div>
-                        <h3 className="mt-2 font-[family-name:var(--font-display)] text-xl font-bold text-[color:var(--color-gt-navy)]">
-                          {member.name}
-                        </h3>
-                        <p className="mt-3 text-sm leading-relaxed text-slate-600">
-                          {member.description || about.teamFallbackDescription || "—"}
-                        </p>
-                      </div>
-                    </article>
+                    (() => {
+                      const isExpanded = Boolean(expandedTeamCards[member._id]);
+                      const description = member.description || about.teamFallbackDescription || "—";
+                      const shouldShowToggle = description.length > 180;
+                      return (
+                        <article
+                          key={member._id}
+                          className="group flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md"
+                        >
+                          <div className="h-1 w-full bg-gradient-to-r from-[color:var(--color-gt-blue)] via-[color:var(--color-gt-accent-green)] to-[color:var(--color-gt-blue)]" />
+                          {member.imageUrl && (
+                            <div className="relative h-72 w-full overflow-hidden bg-slate-100">
+                              <img
+                                src={member.imageUrl}
+                                alt={member.name}
+                                className="h-full w-full object-cover object-top transition duration-500 group-hover:scale-[1.03]"
+                                loading="lazy"
+                              />
+                            </div>
+                          )}
+                          <div className="flex flex-1 flex-col p-5">
+                            <div className="flex items-center justify-between gap-2">
+                              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[color:var(--color-gt-accent-green)]">
+                                {member.title || about.teamFallbackTitle || "TEAM"}
+                              </p>
+                              <span className="rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-[10px] font-bold text-slate-500">
+                                #{member.order ?? index + 1}
+                              </span>
+                            </div>
+                            <h3 className="mt-2 font-[family-name:var(--font-display)] text-xl font-bold text-[color:var(--color-gt-navy)]">
+                              {member.name}
+                            </h3>
+                            <p className={`mt-2 text-sm leading-relaxed text-slate-600 ${isExpanded ? "" : "line-clamp-6"}`}>
+                              {description}
+                            </p>
+                            {shouldShowToggle && (
+                              <button
+                                type="button"
+                                onClick={() => toggleTeamDetails(member._id)}
+                                className="mt-3 w-fit text-sm font-semibold text-[color:var(--color-gt-blue)] hover:underline"
+                              >
+                                {isExpanded ? t("about.readLess") : t("about.readMore")}
+                              </button>
+                            )}
+                          </div>
+                        </article>
+                      );
+                    })()
                   ))
                 )}
               </div>
-            </div>
+            </article>
           </div>
 
-          <aside className="space-y-6 xl:col-span-4 2xl:col-span-3">
-            <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm xl:sticky xl:top-24">
-              <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
-                {about.experienceKicker ?? t("about.experienceKicker")}
-              </p>
-              <p className="mt-2 font-[family-name:var(--font-display)] text-4xl font-bold text-[color:var(--color-gt-navy)]">
-                {about.experienceYears ?? t("about.experienceYears")}
-              </p>
-              <p className="mt-3 text-sm leading-relaxed text-slate-600">{about.experienceText ?? t("about.experienceText")}</p>
-              <ul className="mt-6 space-y-2">
-                {strengths.map((label, idx) => (
-                  <li
-                    key={`${label}-aside-${idx}`}
-                    className="rounded-lg border border-slate-100 bg-slate-50/80 px-3 py-2 text-sm text-slate-700"
-                  >
-                    {label}
-                  </li>
-                ))}
-              </ul>
-            </div>
-
+          <aside className="space-y-6 lg:col-span-4">
             <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
               <h3 className="font-[family-name:var(--font-display)] text-lg font-semibold text-[color:var(--color-gt-navy)]">
                 {about.asideMissionH3 ?? t("about.asideMissionH3")}
               </h3>
-              <p className="mt-3 text-sm leading-relaxed text-slate-600">{about.asideMissionText ?? t("about.asideMissionText")}</p>
+              <p className="mt-3 text-sm leading-relaxed text-slate-600">
+                {about.asideMissionText ?? t("about.asideMissionText")}
+              </p>
+            </div>
+
+            <div className="rounded-3xl border border-[color:var(--color-gt-blue)]/20 bg-[color:var(--color-gt-navy)] p-6 text-white shadow-sm">
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-200">{t("home.contactKicker")}</p>
+              <h3 className="mt-2 font-[family-name:var(--font-display)] text-2xl font-bold">{about.contactCta ?? t("about.contactCta")}</h3>
+              <p className="mt-3 text-sm leading-relaxed text-slate-200">
+                {about.cardCheck ?? t("about.cardCheck")}
+              </p>
               <Link
                 to="/contact"
-                className="mt-5 inline-flex text-sm font-semibold text-[color:var(--color-gt-blue)] hover:underline"
+                className="mt-5 inline-flex rounded-lg bg-white px-4 py-2 text-sm font-semibold text-[color:var(--color-gt-navy)] transition hover:bg-slate-100"
               >
                 {about.contactCta ?? t("about.contactCta")}
               </Link>

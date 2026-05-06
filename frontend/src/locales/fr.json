@@ -4,6 +4,7 @@
     "activities": "Nos Activités",
     "projects": "Nos Projets",
     "clients": "Nos Clients",
+    "team": "Notre Équipe",
     "infrastructure": "OUR INFRASTRUCTURE",
     "news": "Actualités",
     "contact": "Contactez-nous"
@@ -166,7 +167,9 @@
     "experienceText": "Une expérience opérationnelle solide en logistique, transit et coordination douanière.",
     "asideMissionH3": "Notre Mission",
     "asideMissionText": "Offrir des solutions logistiques fiables et transparentes pour vos flux entre l'Europe, l'Asie et l'Afrique de l'Est, via Djibouti.",
-    "contactCta": "Contactez-nous →"
+    "contactCta": "Contactez-nous →",
+    "readMore": "Lire plus",
+    "readLess": "Réduire"
   },
   "contact": {
     "kicker": "Prendre contact",

@@ -4,6 +4,8 @@
     "activities": "Hojiiwwan keenya",
     "projects": "Piroojektiiwwan keenya",
     "clients": "Maamiltoota keenya",
+    "team": "Garee keenya",
+    "infrastructure": "Bu'uuraalee",
     "news": "Oduuwwan",
     "contact": "Nu qunnamaa"
   },
@@ -155,7 +157,9 @@
     "experienceText": "Muuxannoo hojii cimaa loogistiksii, karaa fi walitti hidha kustamaa.",
     "asideMissionH3": "Ergama keenya",
     "asideMissionText": "Mala loogistiksii amanamaa fi ifaa karaa keessanif gidduu Yurooppii, Aashiyaa fi Afrikaa Bahaa, Jabuutii ka'aa.",
-    "contactCta": "Nu qunnamaa →"
+    "contactCta": "Nu qunnamaa →",
+    "readMore": "Dabalata dubbisi",
+    "readLess": "Gabaabsi"
   },
   "contact": {
     "kicker": "Nu qunnamaa",

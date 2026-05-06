@@ -4,6 +4,8 @@
     "activities": "Howlahayaga",
     "projects": "Mashruucyadayada",
     "clients": "Macaamiisheena",
+    "team": "Kooxdeena",
+    "infrastructure": "Kaabayaasha",
     "news": "Wararka",
     "contact": "Nala soo xiriir"
   },
@@ -155,7 +157,9 @@
     "experienceText": "Khibrad hawlgal oo adag ee gaadiidka, marinka iyo isku xirka canshuurta.",
     "asideMissionH3": "Hadafkeena",
     "asideMissionText": "Bixinta xalal gaadiid oo lagu kalsoon yahay oo hufan ee socodkaaga u dhexeeya Yurub, Aasiya iyo Bariga Afrika, iyada oo loo marayo Jabuuti.",
-    "contactCta": "Nala soo xiriir →"
+    "contactCta": "Nala soo xiriir →",
+    "readMore": "Akhri wax dheeraad ah",
+    "readLess": "Yaree"
   },
   "contact": {
     "kicker": "Soo xiriir",

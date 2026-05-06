@@ -679,12 +679,11 @@ function InfrastructureTable({
   return (
     <div className="mt-6 overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-[0_1px_3px_rgba(15,23,42,0.08)]">
       <div className="overflow-x-auto">
-        <table className="min-w-[920px] w-full border-collapse text-left text-sm">
+        <table className="min-w-[760px] w-full border-collapse text-left text-sm">
           <thead>
             <tr className="border-b border-slate-200 bg-gradient-to-b from-slate-50 to-slate-100/90">
               <th className="px-4 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-500">ID</th>
               <th className="px-4 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-500">Nom</th>
-              <th className="px-4 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-500">Description</th>
               <th className="px-4 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-500">Image</th>
               <th className="w-44 px-4 py-3.5 text-right text-xs font-semibold uppercase tracking-wider text-slate-500">
                 Actions
@@ -696,14 +695,11 @@ function InfrastructureTable({
               const imageUrl = String(row.imageUrl ?? "").trim();
               return (
                 <tr key={row._id} className="transition-colors hover:bg-slate-50/90">
-                  <td className="max-w-[170px] truncate px-4 py-3 align-middle">
-                    <code className="text-xs text-slate-600">{row._id}</code>
+                  <td className="max-w-[170px] px-4 py-3 align-middle">
+                    <code className="break-all text-xs text-slate-600">{row._id}</code>
                   </td>
-                  <td className="max-w-[180px] truncate px-4 py-3 align-middle font-semibold text-[color:var(--color-gt-navy)]">
+                  <td className="max-w-[220px] px-4 py-3 align-middle font-semibold text-[color:var(--color-gt-navy)]">
                     {String(row.name ?? "")}
-                  </td>
-                  <td className="max-w-[260px] px-4 py-3 align-middle text-slate-600">
-                    <p className="line-clamp-2 leading-snug">{String(row.description ?? "") || "—"}</p>
                   </td>
                   <td className="px-4 py-3 align-middle">
                     <div className="flex h-14 w-20 items-center justify-center overflow-hidden rounded-lg bg-slate-100 ring-1 ring-slate-200/80">
@@ -742,7 +738,7 @@ function InfrastructureTable({
       </div>
       {rows.length === 0 && (
         <p className="border-t border-slate-100 px-4 py-8 text-center text-sm text-slate-500">
-          Aucune infrastructure. Ajoutez un nom, une description et une image.
+          Aucune infrastructure. Ajoutez un nom et une image.
         </p>
       )}
     </div>

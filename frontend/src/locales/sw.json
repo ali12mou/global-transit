@@ -4,6 +4,8 @@
     "activities": "Shughuli zetu",
     "projects": "Miradi yetu",
     "clients": "Wateja wetu",
+    "team": "Timu yetu",
+    "infrastructure": "Miundombinu",
     "news": "Habari",
     "contact": "Wasiliana nasi"
   },
@@ -155,7 +157,9 @@
     "experienceText": "Uzoefu thabiti wa uendeshaji wa usafirishaji, transit na uratibu wa forodha.",
     "asideMissionH3": "Dhamira yetu",
     "asideMissionText": "Kutoa suluhisho za usafirishaji za kuaminika na wazi kwa mtiririko wako kati ya Ulaya, Asia na Afrika Mashariki, kupitia Djibouti.",
-    "contactCta": "Wasiliana nasi →"
+    "contactCta": "Wasiliana nasi →",
+    "readMore": "Soma zaidi",
+    "readLess": "Punguza"
   },
   "contact": {
     "kicker": "Wasiliana",

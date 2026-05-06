@@ -172,6 +172,10 @@ export function AdminAboutPage() {
     setForm((prev) => ({ ...prev, [key]: value }));
   }
 
+  function saveBlock() {
+    saveMut.mutate(formToPayload(form));
+  }
+
   if (isLoading) return <p className="text-slate-600">Chargement…</p>;
   if (error) return <p className="text-red-700">{(error as Error).message}</p>;
 
@@ -185,93 +189,125 @@ export function AdminAboutPage() {
       </p>
 
       <form
-        className="mt-6 space-y-5 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
+        className="mt-6 space-y-6 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
         onSubmit={(e) => {
           e.preventDefault();
           saveMut.mutate(formToPayload(form));
         }}
       >
-        <TextField label="Kicker" value={form.kicker} onChange={(v) => setField("kicker", v)} />
-        <TextField label="Titre principal" value={form.title} onChange={(v) => setField("title", v)} />
-        <TextAreaField label="Introduction" value={form.intro} onChange={(v) => setField("intro", v)} />
+        <section className="space-y-3 rounded-xl border border-slate-200 p-4">
+          <h2 className="text-sm font-semibold text-slate-800">Bloc Hero</h2>
+          <TextField label="Kicker" value={form.kicker} onChange={(v) => setField("kicker", v)} />
+          <TextField label="Titre principal" value={form.title} onChange={(v) => setField("title", v)} />
+          <TextAreaField label="Introduction" value={form.intro} onChange={(v) => setField("intro", v)} />
+          <BlockSaveButton loading={saveMut.isPending} onClick={saveBlock} />
+        </section>
 
-        <div className="grid gap-4 md:grid-cols-2">
-          <TextField label="Carte - titre" value={form.cardTitle} onChange={(v) => setField("cardTitle", v)} />
-          <TextAreaField label="Carte - texte" value={form.cardText} onChange={(v) => setField("cardText", v)} rows={3} />
-        </div>
-        <TextField label="Carte - ligne validation" value={form.cardCheck} onChange={(v) => setField("cardCheck", v)} />
+        <section className="space-y-3 rounded-xl border border-slate-200 p-4">
+          <h2 className="text-sm font-semibold text-slate-800">Bloc Présentation</h2>
+          <div className="grid gap-4 md:grid-cols-2">
+            <TextField label="Carte - titre" value={form.cardTitle} onChange={(v) => setField("cardTitle", v)} />
+            <TextAreaField label="Carte - texte" value={form.cardText} onChange={(v) => setField("cardText", v)} rows={3} />
+          </div>
+          <TextField label="Carte - ligne validation" value={form.cardCheck} onChange={(v) => setField("cardCheck", v)} />
+          <BlockSaveButton loading={saveMut.isPending} onClick={saveBlock} />
+        </section>
 
-        <div className="grid gap-4 md:grid-cols-2">
-          <TextField label="Mission - titre" value={form.missionH2} onChange={(v) => setField("missionH2", v)} />
-          <TextField label="Services - titre" value={form.servicesH2} onChange={(v) => setField("servicesH2", v)} />
-        </div>
-        <TextAreaField label="Mission - paragraphe 1" value={form.missionP1} onChange={(v) => setField("missionP1", v)} />
-        <TextAreaField label="Mission - paragraphe 2" value={form.missionP2} onChange={(v) => setField("missionP2", v)} />
+        <section className="space-y-3 rounded-xl border border-slate-200 p-4">
+          <h2 className="text-sm font-semibold text-slate-800">Bloc Mission & Services</h2>
+          <div className="grid gap-4 md:grid-cols-2">
+            <TextField label="Mission - titre" value={form.missionH2} onChange={(v) => setField("missionH2", v)} />
+            <TextField label="Services - titre" value={form.servicesH2} onChange={(v) => setField("servicesH2", v)} />
+          </div>
+          <TextAreaField label="Mission - paragraphe 1" value={form.missionP1} onChange={(v) => setField("missionP1", v)} />
+          <TextAreaField label="Mission - paragraphe 2" value={form.missionP2} onChange={(v) => setField("missionP2", v)} />
+          <BlockSaveButton loading={saveMut.isPending} onClick={saveBlock} />
+        </section>
 
-        <div className="grid gap-4 md:grid-cols-2">
-          <TextField label="Points forts - titre" value={form.strengthsTitle} onChange={(v) => setField("strengthsTitle", v)} />
-          <TextField label="Badge standards" value={form.standardsBadge} onChange={(v) => setField("standardsBadge", v)} />
-        </div>
-        <TextAreaField
-          label="Points forts (1 ligne = 1 item)"
-          value={form.strengthsText}
-          onChange={(v) => setField("strengthsText", v)}
-          rows={6}
-        />
-
-        <TextAreaField
-          label="Services (1 ligne = Titre|Texte)"
-          value={form.servicesText}
-          onChange={(v) => setField("servicesText", v)}
-          rows={6}
-        />
-
-        <div className="grid gap-4 md:grid-cols-2">
-          <TextField label="Equipe - titre" value={form.expertsH2} onChange={(v) => setField("expertsH2", v)} />
-          <TextField label="Equipe - badge" value={form.expertsBadge} onChange={(v) => setField("expertsBadge", v)} />
-        </div>
-        <div className="grid gap-4 md:grid-cols-2">
-          <TextField
-            label="Equipe vide - message"
-            value={form.teamEmptyText}
-            onChange={(v) => setField("teamEmptyText", v)}
-          />
-          <TextField
-            label="Equipe - role par defaut"
-            value={form.teamFallbackTitle}
-            onChange={(v) => setField("teamFallbackTitle", v)}
-          />
-        </div>
-        <TextField
-          label="Equipe - description par defaut"
-          value={form.teamFallbackDescription}
-          onChange={(v) => setField("teamFallbackDescription", v)}
-        />
-
-        <div className="grid gap-4 md:grid-cols-3">
-          <TextField
-            label="Experience - kicker"
-            value={form.experienceKicker}
-            onChange={(v) => setField("experienceKicker", v)}
-          />
-          <TextField
-            label="Experience - annees"
-            value={form.experienceYears}
-            onChange={(v) => setField("experienceYears", v)}
-          />
+        <section className="space-y-3 rounded-xl border border-slate-200 p-4">
+          <h2 className="text-sm font-semibold text-slate-800">Bloc Points forts</h2>
+          <div className="grid gap-4 md:grid-cols-2">
+            <TextField label="Points forts - titre" value={form.strengthsTitle} onChange={(v) => setField("strengthsTitle", v)} />
+            <TextField label="Badge standards" value={form.standardsBadge} onChange={(v) => setField("standardsBadge", v)} />
+          </div>
           <TextAreaField
-            label="Experience - texte"
-            value={form.experienceText}
-            onChange={(v) => setField("experienceText", v)}
-            rows={3}
+            label="Points forts (1 ligne = 1 item)"
+            value={form.strengthsText}
+            onChange={(v) => setField("strengthsText", v)}
+            rows={6}
           />
-        </div>
+          <BlockSaveButton loading={saveMut.isPending} onClick={saveBlock} />
+        </section>
 
-        <div className="grid gap-4 md:grid-cols-2">
-          <TextField label="Aside - titre mission" value={form.asideMissionH3} onChange={(v) => setField("asideMissionH3", v)} />
-          <TextField label="CTA contact" value={form.contactCta} onChange={(v) => setField("contactCta", v)} />
-        </div>
-        <TextAreaField label="Aside - texte mission" value={form.asideMissionText} onChange={(v) => setField("asideMissionText", v)} />
+        <section className="space-y-3 rounded-xl border border-slate-200 p-4">
+          <h2 className="text-sm font-semibold text-slate-800">Bloc Cartes services</h2>
+          <TextAreaField
+            label="Services (1 ligne = Titre|Texte)"
+            value={form.servicesText}
+            onChange={(v) => setField("servicesText", v)}
+            rows={6}
+          />
+          <BlockSaveButton loading={saveMut.isPending} onClick={saveBlock} />
+        </section>
+
+        <section className="space-y-3 rounded-xl border border-slate-200 p-4">
+          <h2 className="text-sm font-semibold text-slate-800">Bloc Équipe (public)</h2>
+          <div className="grid gap-4 md:grid-cols-2">
+            <TextField label="Equipe - titre" value={form.expertsH2} onChange={(v) => setField("expertsH2", v)} />
+            <TextField label="Equipe - badge" value={form.expertsBadge} onChange={(v) => setField("expertsBadge", v)} />
+          </div>
+          <div className="grid gap-4 md:grid-cols-2">
+            <TextField
+              label="Equipe vide - message"
+              value={form.teamEmptyText}
+              onChange={(v) => setField("teamEmptyText", v)}
+            />
+            <TextField
+              label="Equipe - role par defaut"
+              value={form.teamFallbackTitle}
+              onChange={(v) => setField("teamFallbackTitle", v)}
+            />
+          </div>
+          <TextField
+            label="Equipe - description par defaut"
+            value={form.teamFallbackDescription}
+            onChange={(v) => setField("teamFallbackDescription", v)}
+          />
+          <BlockSaveButton loading={saveMut.isPending} onClick={saveBlock} />
+        </section>
+
+        <section className="space-y-3 rounded-xl border border-slate-200 p-4">
+          <h2 className="text-sm font-semibold text-slate-800">Bloc Expérience</h2>
+          <div className="grid gap-4 md:grid-cols-3">
+            <TextField
+              label="Experience - kicker"
+              value={form.experienceKicker}
+              onChange={(v) => setField("experienceKicker", v)}
+            />
+            <TextField
+              label="Experience - annees"
+              value={form.experienceYears}
+              onChange={(v) => setField("experienceYears", v)}
+            />
+            <TextAreaField
+              label="Experience - texte"
+              value={form.experienceText}
+              onChange={(v) => setField("experienceText", v)}
+              rows={3}
+            />
+          </div>
+          <BlockSaveButton loading={saveMut.isPending} onClick={saveBlock} />
+        </section>
+
+        <section className="space-y-3 rounded-xl border border-slate-200 p-4">
+          <h2 className="text-sm font-semibold text-slate-800">Bloc Aside & Contact</h2>
+          <div className="grid gap-4 md:grid-cols-2">
+            <TextField label="Aside - titre mission" value={form.asideMissionH3} onChange={(v) => setField("asideMissionH3", v)} />
+            <TextField label="CTA contact" value={form.contactCta} onChange={(v) => setField("contactCta", v)} />
+          </div>
+          <TextAreaField label="Aside - texte mission" value={form.asideMissionText} onChange={(v) => setField("asideMissionText", v)} />
+          <BlockSaveButton loading={saveMut.isPending} onClick={saveBlock} />
+        </section>
 
         {saveMut.isError && <p className="text-sm text-red-700">{(saveMut.error as Error).message}</p>}
         {saveMut.isSuccess && <p className="text-sm text-emerald-700">Contenu About enregistre avec succes.</p>}
@@ -285,6 +321,19 @@ export function AdminAboutPage() {
         </button>
       </form>
     </div>
+  );
+}
+
+function BlockSaveButton({ loading, onClick }: { loading: boolean; onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={loading}
+      className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-60"
+    >
+      {loading ? "Enregistrement..." : "Enregistrer ce bloc"}
+    </button>
   );
 }
 
