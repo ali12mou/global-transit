@@ -315,6 +315,70 @@ mountCrud(adminRouter, "team", "team", Team, { sort: { order: 1, createdAt: -1 }
 mountCrud(adminRouter, "projects", "projects", Project, { prepareCreate: slugFromTitle });
 mountCrud(adminRouter, "news", "news", News, { prepareCreate: prepareNews });
 
+const ABOUT_KEY = "about";
+const ABOUT_BLOCK_FIELDS: Record<string, string[]> = {
+  hero: ["kicker", "title", "intro"],
+  presentation: ["cardTitle", "cardText", "cardCheck"],
+  missionServices: ["missionH2", "missionP1", "missionP2", "servicesH2"],
+  strengths: ["strengthsTitle", "standardsBadge", "strengths"],
+  servicesCards: ["services"],
+  teamPublic: ["expertsH2", "expertsBadge", "teamEmptyText", "teamFallbackTitle", "teamFallbackDescription"],
+  experience: ["experienceKicker", "experienceYears", "experienceText"],
+  asideContact: ["asideMissionH3", "asideMissionText", "contactCta"],
+};
+
+function normalizeAboutValue(raw: unknown): Record<string, unknown> {
+  if (!raw || typeof raw !== "object" || Array.isArray(raw)) return {};
+  return { ...(raw as Record<string, unknown>) };
+}
+
+adminRouter.get("/about", authRequired, requirePermission("configuration.read"), async (_req, res, next) => {
+  try {
+    const row = await Configuration.findOne({ key: ABOUT_KEY }).lean();
+    res.json(normalizeAboutValue(row?.value));
+  } catch (e) {
+    next(e);
+  }
+});
+
+adminRouter.put("/about", authRequired, requirePermission("configuration.write"), async (req, res, next) => {
+  try {
+    const incoming = normalizeAboutValue(req.body?.value);
+    const doc = await Configuration.findOneAndUpdate(
+      { key: ABOUT_KEY },
+      { key: ABOUT_KEY, value: incoming },
+      { new: true, upsert: true, runValidators: true }
+    ).lean();
+    res.json(normalizeAboutValue(doc?.value));
+  } catch (e) {
+    next(e);
+  }
+});
+
+adminRouter.patch("/about/:block", authRequired, requirePermission("configuration.write"), async (req, res, next) => {
+  try {
+    const block = String(req.params.block ?? "");
+    const allowedFields = ABOUT_BLOCK_FIELDS[block];
+    if (!allowedFields) {
+      res.status(400).json({ error: "Bloc About invalide" });
+      return;
+    }
+    const incoming = normalizeAboutValue(req.body?.value);
+    const filtered = Object.fromEntries(Object.entries(incoming).filter(([k]) => allowedFields.includes(k)));
+    const existing = await Configuration.findOne({ key: ABOUT_KEY }).lean();
+    const current = normalizeAboutValue(existing?.value);
+    const nextValue = { ...current, ...filtered };
+    const doc = await Configuration.findOneAndUpdate(
+      { key: ABOUT_KEY },
+      { key: ABOUT_KEY, value: nextValue },
+      { new: true, upsert: true, runValidators: true }
+    ).lean();
+    res.json(normalizeAboutValue(doc?.value));
+  } catch (e) {
+    next(e);
+  }
+});
+
 adminRouter.get("/contacts", authRequired, requirePermission("contact.read"), async (_req, res, next) => {
   try {
     res.json(await Contact.find().sort({ createdAt: -1 }));

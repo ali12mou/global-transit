@@ -1,8 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { apiFetch } from "@/api/client";
-
-type ConfigRow = { _id: string; key: string; value: unknown };
 
 type AboutConfig = {
   kicker?: string;
@@ -140,26 +138,33 @@ function formToPayload(form: AboutForm): AboutConfig {
 
 export function AdminAboutPage() {
   const qc = useQueryClient();
-  const { data: rows = [], isLoading, error } = useQuery({
-    queryKey: ["admin-configurations"],
-    queryFn: () => apiFetch<ConfigRow[]>("/api/admin/configurations"),
+  const { data: current = {}, isLoading, error } = useQuery({
+    queryKey: ["admin-about"],
+    queryFn: () => apiFetch<AboutConfig>("/api/admin/about"),
   });
-
-  const current = useMemo(() => {
-    const row = rows.find((r) => r.key === "about");
-    return (row?.value ?? {}) as AboutConfig;
-  }, [rows]);
 
   const [form, setForm] = useState<AboutForm>(normalizeToForm({}));
 
   const saveMut = useMutation({
     mutationFn: (value: AboutConfig) =>
-      apiFetch(`/api/admin/configurations/about`, {
+      apiFetch("/api/admin/about", {
         method: "PUT",
         body: JSON.stringify({ value }),
       }),
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["admin-configurations"] });
+      qc.invalidateQueries({ queryKey: ["admin-about"] });
+      qc.invalidateQueries({ queryKey: ["public-config"] });
+    },
+  });
+
+  const saveBlockMut = useMutation({
+    mutationFn: ({ block, value }: { block: AboutBlockKey; value: Partial<AboutConfig> }) =>
+      apiFetch(`/api/admin/about/${block}`, {
+        method: "PATCH",
+        body: JSON.stringify({ value }),
+      }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["admin-about"] });
       qc.invalidateQueries({ queryKey: ["public-config"] });
     },
   });
@@ -172,8 +177,12 @@ export function AdminAboutPage() {
     setForm((prev) => ({ ...prev, [key]: value }));
   }
 
-  function saveBlock() {
-    saveMut.mutate(formToPayload(form));
+  function saveBlock(block: AboutBlockKey) {
+    const payload = formToPayload(form);
+    const partial = Object.fromEntries(
+      ABOUT_BLOCK_FIELDS[block].map((field) => [field, payload[field as keyof AboutConfig]])
+    ) as Partial<AboutConfig>;
+    saveBlockMut.mutate({ block, value: partial });
   }
 
   if (isLoading) return <p className="text-slate-600">Chargement…</p>;
@@ -200,7 +209,7 @@ export function AdminAboutPage() {
           <TextField label="Kicker" value={form.kicker} onChange={(v) => setField("kicker", v)} />
           <TextField label="Titre principal" value={form.title} onChange={(v) => setField("title", v)} />
           <TextAreaField label="Introduction" value={form.intro} onChange={(v) => setField("intro", v)} />
-          <BlockSaveButton loading={saveMut.isPending} onClick={saveBlock} />
+          <BlockSaveButton loading={saveBlockMut.isPending} onClick={() => saveBlock("hero")} />
         </section>
 
         <section className="space-y-3 rounded-xl border border-slate-200 p-4">
@@ -210,7 +219,7 @@ export function AdminAboutPage() {
             <TextAreaField label="Carte - texte" value={form.cardText} onChange={(v) => setField("cardText", v)} rows={3} />
           </div>
           <TextField label="Carte - ligne validation" value={form.cardCheck} onChange={(v) => setField("cardCheck", v)} />
-          <BlockSaveButton loading={saveMut.isPending} onClick={saveBlock} />
+          <BlockSaveButton loading={saveBlockMut.isPending} onClick={() => saveBlock("presentation")} />
         </section>
 
         <section className="space-y-3 rounded-xl border border-slate-200 p-4">
@@ -221,7 +230,7 @@ export function AdminAboutPage() {
           </div>
           <TextAreaField label="Mission - paragraphe 1" value={form.missionP1} onChange={(v) => setField("missionP1", v)} />
           <TextAreaField label="Mission - paragraphe 2" value={form.missionP2} onChange={(v) => setField("missionP2", v)} />
-          <BlockSaveButton loading={saveMut.isPending} onClick={saveBlock} />
+          <BlockSaveButton loading={saveBlockMut.isPending} onClick={() => saveBlock("missionServices")} />
         </section>
 
         <section className="space-y-3 rounded-xl border border-slate-200 p-4">
@@ -236,7 +245,7 @@ export function AdminAboutPage() {
             onChange={(v) => setField("strengthsText", v)}
             rows={6}
           />
-          <BlockSaveButton loading={saveMut.isPending} onClick={saveBlock} />
+          <BlockSaveButton loading={saveBlockMut.isPending} onClick={() => saveBlock("strengths")} />
         </section>
 
         <section className="space-y-3 rounded-xl border border-slate-200 p-4">
@@ -247,7 +256,7 @@ export function AdminAboutPage() {
             onChange={(v) => setField("servicesText", v)}
             rows={6}
           />
-          <BlockSaveButton loading={saveMut.isPending} onClick={saveBlock} />
+          <BlockSaveButton loading={saveBlockMut.isPending} onClick={() => saveBlock("servicesCards")} />
         </section>
 
         <section className="space-y-3 rounded-xl border border-slate-200 p-4">
@@ -273,7 +282,7 @@ export function AdminAboutPage() {
             value={form.teamFallbackDescription}
             onChange={(v) => setField("teamFallbackDescription", v)}
           />
-          <BlockSaveButton loading={saveMut.isPending} onClick={saveBlock} />
+          <BlockSaveButton loading={saveBlockMut.isPending} onClick={() => saveBlock("teamPublic")} />
         </section>
 
         <section className="space-y-3 rounded-xl border border-slate-200 p-4">
@@ -296,7 +305,7 @@ export function AdminAboutPage() {
               rows={3}
             />
           </div>
-          <BlockSaveButton loading={saveMut.isPending} onClick={saveBlock} />
+          <BlockSaveButton loading={saveBlockMut.isPending} onClick={() => saveBlock("experience")} />
         </section>
 
         <section className="space-y-3 rounded-xl border border-slate-200 p-4">
@@ -306,11 +315,14 @@ export function AdminAboutPage() {
             <TextField label="CTA contact" value={form.contactCta} onChange={(v) => setField("contactCta", v)} />
           </div>
           <TextAreaField label="Aside - texte mission" value={form.asideMissionText} onChange={(v) => setField("asideMissionText", v)} />
-          <BlockSaveButton loading={saveMut.isPending} onClick={saveBlock} />
+          <BlockSaveButton loading={saveBlockMut.isPending} onClick={() => saveBlock("asideContact")} />
         </section>
 
         {saveMut.isError && <p className="text-sm text-red-700">{(saveMut.error as Error).message}</p>}
-        {saveMut.isSuccess && <p className="text-sm text-emerald-700">Contenu About enregistre avec succes.</p>}
+        {saveBlockMut.isError && <p className="text-sm text-red-700">{(saveBlockMut.error as Error).message}</p>}
+        {(saveMut.isSuccess || saveBlockMut.isSuccess) && (
+          <p className="text-sm text-emerald-700">Contenu About enregistre avec succes.</p>
+        )}
 
         <button
           type="submit"
@@ -323,6 +335,27 @@ export function AdminAboutPage() {
     </div>
   );
 }
+
+type AboutBlockKey =
+  | "hero"
+  | "presentation"
+  | "missionServices"
+  | "strengths"
+  | "servicesCards"
+  | "teamPublic"
+  | "experience"
+  | "asideContact";
+
+const ABOUT_BLOCK_FIELDS: Record<AboutBlockKey, Array<keyof AboutConfig>> = {
+  hero: ["kicker", "title", "intro"],
+  presentation: ["cardTitle", "cardText", "cardCheck"],
+  missionServices: ["missionH2", "missionP1", "missionP2", "servicesH2"],
+  strengths: ["strengthsTitle", "standardsBadge", "strengths"],
+  servicesCards: ["services"],
+  teamPublic: ["expertsH2", "expertsBadge", "teamEmptyText", "teamFallbackTitle", "teamFallbackDescription"],
+  experience: ["experienceKicker", "experienceYears", "experienceText"],
+  asideContact: ["asideMissionH3", "asideMissionText", "contactCta"],
+};
 
 function BlockSaveButton({ loading, onClick }: { loading: boolean; onClick: () => void }) {
   return (
