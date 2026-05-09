@@ -102,15 +102,15 @@ export function AboutPage() {
   }
 
   return (
-    <div className="bg-slate-50">
-      <section className="relative overflow-hidden border-b border-slate-200 bg-[color:var(--color-gt-navy)] text-white">
+    <div className="min-h-screen w-full bg-slate-50">
+      <section className="relative w-full overflow-hidden border-b border-slate-200 bg-[color:var(--color-gt-navy)] text-white">
         <div
           className="absolute inset-0 bg-cover bg-center"
           style={{ backgroundImage: "url('/images/hero/hero-4.png')" }}
         />
         <div className="absolute inset-0 bg-[linear-gradient(105deg,rgba(4,10,20,0.88)_0%,rgba(4,10,20,0.8)_45%,rgba(4,10,20,0.68)_100%)]" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(34,197,94,0.16),transparent_46%),radial-gradient(circle_at_15%_80%,rgba(56,189,248,0.14),transparent_42%)]" />
-        <div className="relative mx-auto w-full max-w-[1440px] px-4 py-14 sm:px-6 md:py-16 lg:px-8 xl:px-10">
+        <div className="relative w-full px-4 py-16 sm:px-6 md:py-20 lg:px-10 xl:px-16 2xl:px-24">
           <p className="text-xs font-bold uppercase tracking-[0.24em] text-emerald-200">
             {about.kicker ?? t("about.kicker")}
           </p>
@@ -123,7 +123,7 @@ export function AboutPage() {
         </div>
       </section>
 
-      <section className="mx-auto w-full max-w-[1440px] px-4 py-10 sm:px-6 md:py-14 lg:px-8 xl:px-10">
+      <section className="w-full px-4 py-10 sm:px-6 md:py-14 lg:px-10 xl:px-16 2xl:px-24">
         <div className="grid gap-6 lg:grid-cols-12">
           <article className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm lg:col-span-8">
             <div className="flex flex-col items-start gap-5 md:flex-row md:items-center">
@@ -157,7 +157,7 @@ export function AboutPage() {
         </div>
       </section>
 
-      <section className="mx-auto w-full max-w-[1440px] px-4 pb-14 sm:px-6 lg:px-8 xl:px-10">
+      <section className="w-full px-4 pb-14 sm:px-6 lg:px-10 xl:px-16 2xl:px-24">
         <div className="grid gap-6 lg:grid-cols-12">
           <div className="space-y-6 lg:col-span-8">
             <article id="team-section" className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm md:p-8">
@@ -221,7 +221,7 @@ export function AboutPage() {
                 </span>
               </div>
 
-              <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+              <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
                 {team.length === 0 ? (
                   <p className="col-span-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-6 text-center text-slate-600">
                     {about.teamEmptyText ?? t("publicPages.noContent")}
