@@ -171,6 +171,8 @@ export const entityModules: EntityModule[] = [
       { key: "order", label: "Ordre", type: "number" },
       { key: "title", label: "Titre", type: "text" },
       { key: "name", label: "Nom", type: "text" },
+      { key: "phone", label: "Téléphone", type: "text" },
+      { key: "email", label: "Email", type: "text" },
       { key: "description", label: "Description", type: "textarea" },
       {
         key: "imageUrl",

@@ -18,7 +18,6 @@ export function Header() {
   const nav = useMemo(
     () => [
       { to: "/a-propos", label: t("nav.about") },
-      { to: "/equipe", label: t("nav.team") },
       { to: "/activites", label: t("nav.activities") },
       { to: "/projets", label: t("nav.projects") },
       { to: "/infrastructures", label: t("nav.infrastructure") },

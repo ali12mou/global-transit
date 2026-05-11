@@ -1,4 +1,4 @@
-import { FaCheck } from "react-icons/fa";
+import { FaCheck, FaEnvelope, FaPhone } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
@@ -18,6 +18,8 @@ type TeamMember = {
   order?: number;
   title?: string;
   name: string;
+  phone?: string;
+  email?: string;
   description?: string;
   imageUrl?: string;
 };
@@ -260,7 +262,29 @@ export function AboutPage() {
                             <h3 className="mt-2 font-[family-name:var(--font-display)] text-xl font-bold text-[color:var(--color-gt-navy)]">
                               {member.name}
                             </h3>
-                            <p className={`mt-2 text-sm leading-relaxed text-slate-600 ${isExpanded ? "" : "line-clamp-6"}`}>
+                            {(member.phone || member.email) && (
+                              <div className="mt-3 flex flex-col gap-1.5 text-sm">
+                                {member.phone && (
+                                  <a
+                                    href={`tel:${member.phone.replace(/\s+/g, "")}`}
+                                    className="inline-flex items-center gap-2 text-slate-700 hover:text-[color:var(--color-gt-blue)]"
+                                  >
+                                    <FaPhone className="h-3.5 w-3.5 text-[color:var(--color-gt-accent-green)]" />
+                                    <span dir="ltr">{member.phone}</span>
+                                  </a>
+                                )}
+                                {member.email && (
+                                  <a
+                                    href={`mailto:${member.email}`}
+                                    className="inline-flex items-center gap-2 break-all text-slate-700 hover:text-[color:var(--color-gt-blue)]"
+                                  >
+                                    <FaEnvelope className="h-3.5 w-3.5 text-[color:var(--color-gt-accent-green)]" />
+                                    <span>{member.email}</span>
+                                  </a>
+                                )}
+                              </div>
+                            )}
+                            <p className={`mt-3 text-sm leading-relaxed text-slate-600 ${isExpanded ? "" : "line-clamp-6"}`}>
                               {description}
                             </p>
                             {shouldShowToggle && (

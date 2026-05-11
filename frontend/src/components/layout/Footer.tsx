@@ -51,11 +51,6 @@ export function Footer() {
               </li>
               <li>
                 <Link to="/a-propos" className="text-slate-400 hover:text-white">
-                  {t("footer.team")}
-                </Link>
-              </li>
-              <li>
-                <Link to="/a-propos" className="text-slate-400 hover:text-white">
                   {t("footer.careers")}
                 </Link>
               </li>

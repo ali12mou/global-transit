@@ -90,8 +90,10 @@ function LogoMarquee<T extends { _id: string }>({
 }
 
 export function Home() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [heroSlide, setHeroSlide] = useState(0);
+  /** Blocs édités en admin sont en français ; les autres langues lisent les fichiers i18n. */
+  const useFrenchCms = i18n.resolvedLanguage?.startsWith("fr") ?? false;
 
   useEffect(() => {
     const id = window.setInterval(() => {
@@ -194,13 +196,13 @@ export function Home() {
         <div className="absolute inset-0 bg-gradient-to-r from-[color:var(--color-gt-navy)]/85 via-[color:var(--color-gt-navy)]/65 to-[color:var(--color-gt-navy)]/45" />
         <div className="relative z-10 mx-auto flex min-h-[520px] max-w-7xl flex-col justify-center px-4 py-24 md:min-h-[560px] md:py-32">
           <span className="mb-4 inline-flex w-fit rounded-sm bg-[color:var(--color-gt-whatsapp)] px-3 py-1 text-xs font-semibold uppercase tracking-wide text-white">
-            {site.heroTag ?? t("home.heroTag")}
+            {(useFrenchCms ? site.heroTag : undefined) ?? t("home.heroTag")}
           </span>
           <h1 className="max-w-3xl font-[family-name:var(--font-display)] text-4xl font-bold leading-tight text-white md:text-5xl">
-            {site.heroTitle ?? t("home.heroTitle")}
+            {(useFrenchCms ? site.heroTitle : undefined) ?? t("home.heroTitle")}
           </h1>
           <p className="mt-6 max-w-2xl text-lg leading-relaxed text-white/90">
-            {site.heroSubtitle ?? t("home.heroSubtitle")}
+            {(useFrenchCms ? site.heroSubtitle : undefined) ?? t("home.heroSubtitle")}
           </p>
           <div className="mt-10 flex flex-wrap gap-4">
             <Link
@@ -228,22 +230,22 @@ export function Home() {
 
       <section className="mx-auto max-w-7xl px-4 py-20">
         <h2 className="text-center font-[family-name:var(--font-display)] text-3xl font-bold text-[color:var(--color-gt-navy)] md:text-4xl">
-          {site.aboutTitle ?? t("home.aboutTitle")}
+          {(useFrenchCms ? site.aboutTitle : undefined) ?? t("home.aboutTitle")}
         </h2>
         <div className="mt-12 grid gap-10 lg:grid-cols-2">
           <div>
             <p className="leading-relaxed text-slate-600">
-              {site.aboutText ?? t("home.aboutText")}
+              {(useFrenchCms ? site.aboutText : undefined) ?? t("home.aboutText")}
             </p>
             <div className="mt-8 rounded-xl border border-slate-200 bg-slate-50 p-6">
               <div className="flex items-start gap-3">
                 <FaCheck className="mt-1 text-[color:var(--color-gt-accent-green)]" />
                 <div>
                   <div className="font-semibold text-[color:var(--color-gt-navy)]">
-                    {site.missionTitle ?? t("home.missionTitle")}
+                    {(useFrenchCms ? site.missionTitle : undefined) ?? t("home.missionTitle")}
                   </div>
                   <p className="mt-2 text-sm text-slate-600">
-                    {site.missionText ?? t("home.missionText")}
+                    {(useFrenchCms ? site.missionText : undefined) ?? t("home.missionText")}
                   </p>
                 </div>
               </div>
@@ -260,7 +262,7 @@ export function Home() {
             </div>
             <div className="text-center">
               <span className="font-[family-name:var(--font-display)] text-6xl font-bold text-[color:var(--color-gt-coral)]">
-                {site.yearsExperience ?? "15+"}
+                {(useFrenchCms ? site.yearsExperience : undefined) ?? "15+"}
               </span>
               <p className="text-sm font-medium text-slate-500">{t("home.yearsExperience")}</p>
             </div>
