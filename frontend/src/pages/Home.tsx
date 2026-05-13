@@ -14,6 +14,7 @@ import {
   FaMapMarkerAlt,
 } from "react-icons/fa";
 import { apiFetch } from "@/api/client";
+import { buildWhatsAppUrl, COMPANY_WHATSAPP_DIGITS } from "@/lib/contactReply";
 import { HeroBackgroundSlider, HeroSliderDots } from "@/components/home/HeroBackgroundSlider";
 import { HERO_SLIDE_COUNT } from "@/components/home/heroSlides";
 
@@ -127,6 +128,11 @@ export function Home() {
     return m;
   }, [partners]);
 
+  const companyWhatsAppUrl = useMemo(
+    () => buildWhatsAppUrl(COMPANY_WHATSAPP_DIGITS, t("contact.whatsappPrefilledMessage")),
+    [t, i18n.language]
+  );
+
   const { data: infrastructures = [] } = useQuery({
     queryKey: ["infrastructures"],
     queryFn: () => apiFetch<Infrastructure[]>("/api/infrastructures", { auth: false }),
@@ -213,7 +219,7 @@ export function Home() {
               <FaArrowRight />
             </Link>
             <a
-              href="https://wa.me/25377696130"
+              href={companyWhatsAppUrl}
               target="_blank"
               rel="noreferrer"
               className="inline-flex items-center gap-2 rounded-sm bg-[color:var(--color-gt-whatsapp)] px-6 py-3 text-sm font-semibold text-white hover:brightness-110"
@@ -620,7 +626,7 @@ export function Home() {
               </li>
             </ul>
             <a
-              href="https://wa.me/25377696130"
+              href={companyWhatsAppUrl}
               target="_blank"
               rel="noreferrer"
               className="mt-8 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[color:var(--color-gt-whatsapp)] py-3 font-semibold text-white hover:brightness-110"

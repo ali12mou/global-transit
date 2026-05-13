@@ -10,10 +10,16 @@ import {
 } from "react-icons/fa";
 import { Logo } from "@/components/brand/Logo";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { buildWhatsAppUrl, COMPANY_WHATSAPP_DIGITS } from "@/lib/contactReply";
 
 export function Header() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [open, setOpen] = useState(false);
+
+  const companyWhatsAppUrl = useMemo(
+    () => buildWhatsAppUrl(COMPANY_WHATSAPP_DIGITS, t("contact.whatsappPrefilledMessage")),
+    [t, i18n.language]
+  );
 
   const nav = useMemo(
     () => [
@@ -46,7 +52,7 @@ export function Header() {
             </span>
           </div>
           <a
-            href="https://wa.me/25377696130"
+            href={companyWhatsAppUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 rounded-full bg-[color:var(--color-gt-whatsapp)] px-4 py-1.5 text-sm font-medium text-white hover:brightness-110"

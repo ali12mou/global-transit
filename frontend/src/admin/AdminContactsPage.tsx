@@ -6,6 +6,7 @@ import { apiFetch } from "@/api/client";
 import {
   buildMailtoReply,
   buildWhatsAppUrl,
+  COMPANY_WHATSAPP_DIGITS,
   extractPhoneDigitsFromMessage,
 } from "@/lib/contactReply";
 
@@ -18,8 +19,6 @@ type ContactRow = {
   status: string;
   createdAt: string;
 };
-
-const COMPANY_WHATSAPP_DIGITS = "25377696130";
 
 export function AdminContactsPage() {
   const { t } = useTranslation();

@@ -1,3 +1,6 @@
+/** Numéro WhatsApp entreprise (sans +), utilisé pour les liens wa.me côté site public. */
+export const COMPANY_WHATSAPP_DIGITS = "25377696130";
+
 /** Extrait un numéro exploitable pour wa.me à partir du texte du message (formulaire contact). */
 export function extractPhoneDigitsFromMessage(message: string): string | null {
   if (!message?.trim()) return null;

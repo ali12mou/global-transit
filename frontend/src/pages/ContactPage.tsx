@@ -1,10 +1,16 @@
 import { useMutation } from "@tanstack/react-query";
+import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { FaEnvelope, FaMapMarkerAlt, FaPhone, FaWhatsapp } from "react-icons/fa";
 import { apiFetch } from "@/api/client";
+import { buildWhatsAppUrl, COMPANY_WHATSAPP_DIGITS } from "@/lib/contactReply";
 
 export function ContactPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const companyWhatsAppUrl = useMemo(
+    () => buildWhatsAppUrl(COMPANY_WHATSAPP_DIGITS, t("contact.whatsappPrefilledMessage")),
+    [t, i18n.language]
+  );
   const contactMut = useMutation({
     mutationFn: (body: Record<string, string>) =>
       apiFetch<{ ok: boolean }>("/api/contact", { method: "POST", body: JSON.stringify(body), auth: false }),
@@ -190,7 +196,7 @@ export function ContactPage() {
             </li>
           </ul>
           <a
-            href="https://wa.me/25377696130"
+            href={companyWhatsAppUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="mt-8 inline-flex w-full max-w-md items-center justify-center gap-2 rounded-lg bg-[#1b4332] px-4 py-3 text-sm font-semibold text-white shadow-lg hover:brightness-110 sm:w-auto"
