@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { FaShip, FaTruck, FaWarehouse } from "react-icons/fa";
+import { InfrastructureGallery } from "@/components/infrastructure/InfrastructureGallery";
 import { apiFetch } from "@/api/client";
 
 type Infrastructure = { _id: string; name: string; imageUrl?: string; order?: number };
@@ -11,9 +12,6 @@ export function InfrastructurePage() {
     queryKey: ["infrastructure-page"],
     queryFn: () => apiFetch<Infrastructure[]>("/api/infrastructures", { auth: false }),
   });
-
-  const featured = infrastructures[0];
-  const rest = infrastructures.slice(1);
 
   return (
     <div className="bg-white">
@@ -72,64 +70,8 @@ export function InfrastructurePage() {
         {!isLoading && !error && infrastructures.length === 0 && (
           <p className="text-center text-slate-500">{t("publicPages.noContent")}</p>
         )}
-
-        {featured && (
-          <article className="group relative mb-12 overflow-hidden rounded-3xl border border-slate-200 shadow-lg">
-            <div className="relative aspect-[16/7] bg-slate-100 md:aspect-[21/8]">
-              {featured.imageUrl ? (
-                <img
-                  src={featured.imageUrl}
-                  alt={featured.name}
-                  className="h-full w-full object-cover transition duration-700 group-hover:scale-[1.04]"
-                />
-              ) : (
-                <div className="flex h-full items-center justify-center bg-gradient-to-br from-slate-200 to-slate-100 text-slate-400">
-                  Global Transit
-                </div>
-              )}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />
-              <div className="absolute inset-x-0 bottom-0 p-6 md:p-10">
-                <span className="inline-flex items-center gap-2 rounded-full bg-[color:var(--color-gt-coral)] px-3 py-1 text-xs font-bold uppercase tracking-wider text-white">
-                  {t("publicPages.featured")}
-                </span>
-                <h2 className="mt-3 font-[family-name:var(--font-display)] text-2xl font-bold text-white md:text-4xl">
-                  {featured.name}
-                </h2>
-              </div>
-            </div>
-          </article>
-        )}
-
-        {rest.length > 0 && (
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {rest.map((item) => (
-              <article
-                key={item._id}
-                className="group relative overflow-hidden rounded-2xl border border-slate-200 shadow-sm transition hover:shadow-xl"
-              >
-                <div className="relative aspect-[4/5] bg-slate-100">
-                  {item.imageUrl ? (
-                    <img
-                      src={item.imageUrl}
-                      alt={item.name}
-                      className="h-full w-full object-cover transition duration-700 group-hover:scale-[1.06]"
-                    />
-                  ) : (
-                    <div className="flex h-full items-center justify-center bg-gradient-to-br from-slate-200 to-slate-100 text-slate-400">
-                      Global Transit
-                    </div>
-                  )}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-                  <div className="absolute inset-x-0 bottom-0 p-5">
-                    <span className="inline-block h-1 w-10 rounded-full bg-[color:var(--color-gt-coral)] transition-all duration-500 group-hover:w-16" />
-                    <h3 className="mt-3 font-[family-name:var(--font-display)] text-lg font-semibold text-white md:text-xl">
-                      {item.name}
-                    </h3>
-                  </div>
-                </div>
-              </article>
-            ))}
-          </div>
+        {!isLoading && !error && infrastructures.length > 0 && (
+          <InfrastructureGallery variant="page" items={infrastructures} />
         )}
       </section>
     </div>

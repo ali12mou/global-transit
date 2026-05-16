@@ -22,11 +22,25 @@ export function extractPhoneDigitsFromMessage(message: string): string | null {
   return null;
 }
 
-function normalizeDjiboutiWhatsAppDigits(digits: string): string {
+export function normalizeDjiboutiWhatsAppDigits(digits: string): string {
   if (digits.startsWith("253")) return digits;
   if (digits.length === 9 && digits.startsWith("77")) return `253${digits}`;
   if (digits.length === 8 && digits.startsWith("77")) return `253${digits}`;
   return digits;
+}
+
+/** Numéro affiché → chiffres pour wa.me (null si trop court). */
+export function digitsFromPhoneDisplay(phone: string): string | null {
+  const digits = phone.replace(/\D/g, "");
+  if (digits.length < 8) return null;
+  return normalizeDjiboutiWhatsAppDigits(digits);
+}
+
+export function normalizeWebsiteHref(url: string): string {
+  const t = url.trim();
+  if (!t) return "";
+  if (/^https?:\/\//i.test(t)) return t;
+  return `https://${t}`;
 }
 
 export function buildWhatsAppUrl(phoneDigits: string, prefilledBody?: string): string {

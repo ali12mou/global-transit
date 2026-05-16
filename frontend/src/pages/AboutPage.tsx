@@ -1,8 +1,7 @@
-import { FaCheck, FaEnvelope, FaPhone } from "react-icons/fa";
+import { FaCheck } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
 import {
   IoChatbubblesOutline,
   IoDocumentTextOutline,
@@ -11,6 +10,7 @@ import {
   IoRibbonOutline,
 } from "react-icons/io5";
 import { Logo } from "@/components/brand/Logo";
+import { TeamEnterpriseShowcase } from "@/components/team/TeamEnterpriseShowcase";
 import { apiFetch } from "@/api/client";
 
 type TeamMember = {
@@ -20,6 +20,8 @@ type TeamMember = {
   name: string;
   phone?: string;
   email?: string;
+  website?: string;
+  formation?: string;
   description?: string;
   imageUrl?: string;
 };
@@ -78,7 +80,6 @@ const serviceCardKeys = [
 
 export function AboutPage() {
   const { t } = useTranslation();
-  const [expandedTeamCards, setExpandedTeamCards] = useState<Record<string, boolean>>({});
   const { data: team = [] } = useQuery({
     queryKey: ["team"],
     queryFn: () => apiFetch<TeamMember[]>("/api/team", { auth: false }),
@@ -98,10 +99,6 @@ export function AboutPage() {
         title: t(`about.${s.title}`),
         text: t(`about.${s.text}`),
       }));
-
-  function toggleTeamDetails(memberId: string) {
-    setExpandedTeamCards((prev) => ({ ...prev, [memberId]: !prev[memberId] }));
-  }
 
   return (
     <div className="min-h-screen w-full bg-slate-50">
@@ -223,86 +220,17 @@ export function AboutPage() {
                 </span>
               </div>
 
-              <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
-                {team.length === 0 ? (
-                  <p className="col-span-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-6 text-center text-slate-600">
-                    {about.teamEmptyText ?? t("publicPages.noContent")}
-                  </p>
-                ) : (
-                  team.map((member, index) => (
-                    (() => {
-                      const isExpanded = Boolean(expandedTeamCards[member._id]);
-                      const description = member.description || about.teamFallbackDescription || "—";
-                      const shouldShowToggle = description.length > 180;
-                      return (
-                        <article
-                          key={member._id}
-                          className="group flex h-full flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md"
-                        >
-                          <div className="h-1 w-full bg-gradient-to-r from-[color:var(--color-gt-blue)] via-[color:var(--color-gt-accent-green)] to-[color:var(--color-gt-blue)]" />
-                          {member.imageUrl && (
-                            <div className="relative h-72 w-full overflow-hidden bg-slate-100">
-                              <img
-                                src={member.imageUrl}
-                                alt={member.name}
-                                className="h-full w-full object-cover object-top transition duration-500 group-hover:scale-[1.03]"
-                                loading="lazy"
-                              />
-                            </div>
-                          )}
-                          <div className="flex flex-1 flex-col p-5">
-                            <div className="flex items-center justify-between gap-2">
-                              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[color:var(--color-gt-accent-green)]">
-                                {member.title || about.teamFallbackTitle || "TEAM"}
-                              </p>
-                              <span className="rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-[10px] font-bold text-slate-500">
-                                #{member.order ?? index + 1}
-                              </span>
-                            </div>
-                            <h3 className="mt-2 font-[family-name:var(--font-display)] text-xl font-bold text-[color:var(--color-gt-navy)]">
-                              {member.name}
-                            </h3>
-                            {(member.phone || member.email) && (
-                              <div className="mt-3 flex flex-col gap-1.5 text-sm">
-                                {member.phone && (
-                                  <a
-                                    href={`tel:${member.phone.replace(/\s+/g, "")}`}
-                                    className="inline-flex items-center gap-2 text-slate-700 hover:text-[color:var(--color-gt-blue)]"
-                                  >
-                                    <FaPhone className="h-3.5 w-3.5 text-[color:var(--color-gt-accent-green)]" />
-                                    <span dir="ltr">{member.phone}</span>
-                                  </a>
-                                )}
-                                {member.email && (
-                                  <a
-                                    href={`mailto:${member.email}`}
-                                    className="inline-flex items-center gap-2 break-all text-slate-700 hover:text-[color:var(--color-gt-blue)]"
-                                  >
-                                    <FaEnvelope className="h-3.5 w-3.5 text-[color:var(--color-gt-accent-green)]" />
-                                    <span>{member.email}</span>
-                                  </a>
-                                )}
-                              </div>
-                            )}
-                            <p className={`mt-3 text-sm leading-relaxed text-slate-600 ${isExpanded ? "" : "line-clamp-6"}`}>
-                              {description}
-                            </p>
-                            {shouldShowToggle && (
-                              <button
-                                type="button"
-                                onClick={() => toggleTeamDetails(member._id)}
-                                className="mt-3 w-fit text-sm font-semibold text-[color:var(--color-gt-blue)] hover:underline"
-                              >
-                                {isExpanded ? t("about.readLess") : t("about.readMore")}
-                              </button>
-                            )}
-                          </div>
-                        </article>
-                      );
-                    })()
-                  ))
-                )}
-              </div>
+              {team.length === 0 ? (
+                <p className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-6 text-center text-slate-600">
+                  {about.teamEmptyText ?? t("publicPages.noContent")}
+                </p>
+              ) : (
+                <TeamEnterpriseShowcase
+                  members={team}
+                  fallbackTitle={about.teamFallbackTitle}
+                  fallbackDescription={about.teamFallbackDescription}
+                />
+              )}
             </article>
           </div>
 

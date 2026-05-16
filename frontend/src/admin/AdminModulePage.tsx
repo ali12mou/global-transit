@@ -1,7 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
+import { FaEnvelope, FaGlobe, FaWhatsapp } from "react-icons/fa";
 import { IoPencil, IoTrashOutline } from "react-icons/io5";
 import { apiFetch, apiUploadImage } from "@/api/client";
+import { buildWhatsAppUrl, digitsFromPhoneDisplay, normalizeWebsiteHref } from "@/lib/contactReply";
 import { slugify } from "@/lib/slugify";
 import type { EntityModule, FieldDef } from "./entityModules";
 import type { UploadCategory } from "@/uploadCategory";
@@ -39,6 +41,9 @@ export function AdminModulePage({ module }: { module: EntityModule }) {
         qc.invalidateQueries({ queryKey: ["news-page"] });
         qc.invalidateQueries({ queryKey: ["news"] });
       }
+      if (module.route === "team") {
+        qc.invalidateQueries({ queryKey: ["team"] });
+      }
       setEditing(null);
       setCreating(false);
     },
@@ -51,6 +56,9 @@ export function AdminModulePage({ module }: { module: EntityModule }) {
       if (module.route === "news") {
         qc.invalidateQueries({ queryKey: ["news-page"] });
         qc.invalidateQueries({ queryKey: ["news"] });
+      }
+      if (module.route === "team") {
+        qc.invalidateQueries({ queryKey: ["team"] });
       }
     },
   });
@@ -584,6 +592,53 @@ function PartnersTable({
   );
 }
 
+function TeamPhoneCell({ phone }: { phone: string }) {
+  const trimmed = phone.trim();
+  if (!trimmed) return <span className="text-slate-400">—</span>;
+  const digits = digitsFromPhoneDisplay(trimmed);
+  if (!digits) return <span dir="ltr" className="text-slate-600">{trimmed}</span>;
+  return (
+    <a
+      href={buildWhatsAppUrl(digits)}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="inline-flex items-center gap-1.5 font-medium text-[#128C7E] hover:underline"
+      title="Ouvrir WhatsApp"
+    >
+      <FaWhatsapp className="h-4 w-4 shrink-0 text-[#25D366]" aria-hidden />
+      <span dir="ltr">{trimmed}</span>
+    </a>
+  );
+}
+
+function TeamEmailCell({ email }: { email: string }) {
+  const trimmed = email.trim();
+  if (!trimmed) return <span className="text-slate-400">—</span>;
+  return (
+    <a href={`mailto:${trimmed}`} className="break-all text-[color:var(--color-gt-blue)] hover:underline">
+      <FaEnvelope className="mr-1 inline h-3.5 w-3.5 text-[color:var(--color-gt-accent-green)]" aria-hidden />
+      {trimmed}
+    </a>
+  );
+}
+
+function TeamWebsiteCell({ website }: { website: string }) {
+  const trimmed = website.trim();
+  if (!trimmed) return <span className="text-slate-400">—</span>;
+  const href = normalizeWebsiteHref(trimmed);
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="inline-flex items-center gap-1 break-all text-[color:var(--color-gt-blue)] hover:underline"
+    >
+      <FaGlobe className="h-3.5 w-3.5 shrink-0 text-[color:var(--color-gt-accent-green)]" aria-hidden />
+      {trimmed.replace(/^https?:\/\//i, "")}
+    </a>
+  );
+}
+
 function TeamTable({
   rows,
   onEdit,
@@ -596,14 +651,18 @@ function TeamTable({
   return (
     <div className="mt-6 overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-[0_1px_3px_rgba(15,23,42,0.08)]">
       <div className="overflow-x-auto">
-        <table className="min-w-[980px] w-full border-collapse text-left text-sm">
+        <table className="min-w-[1400px] w-full border-collapse text-left text-sm">
           <thead>
             <tr className="border-b border-slate-200 bg-gradient-to-b from-slate-50 to-slate-100/90">
               <th className="px-4 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-500">Photo</th>
               <th className="px-3 py-3.5 text-center text-xs font-semibold uppercase tracking-wider text-slate-500">Ordre</th>
               <th className="px-4 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-500">Titre</th>
               <th className="px-4 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-500">Nom</th>
+              <th className="px-4 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-500">Téléphone</th>
+              <th className="px-4 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-500">Email</th>
               <th className="px-4 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-500">Description</th>
+              <th className="px-4 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-500">Formation pro</th>
+              <th className="px-4 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-500">Profil web</th>
               <th className="w-44 px-4 py-3.5 text-right text-xs font-semibold uppercase tracking-wider text-slate-500">
                 Actions
               </th>
@@ -630,8 +689,20 @@ function TeamTable({
                 <td className="max-w-[180px] truncate px-4 py-3 align-middle font-semibold text-[color:var(--color-gt-navy)]">
                   {String(row.name ?? "")}
                 </td>
-                <td className="max-w-[320px] px-4 py-3 align-middle text-slate-600">
+                <td className="max-w-[140px] px-4 py-3 align-middle">
+                  <TeamPhoneCell phone={String(row.phone ?? "")} />
+                </td>
+                <td className="max-w-[180px] px-4 py-3 align-middle">
+                  <TeamEmailCell email={String(row.email ?? "")} />
+                </td>
+                <td className="max-w-[240px] px-4 py-3 align-middle text-slate-600">
                   <p className="line-clamp-2 leading-snug">{String(row.description ?? "") || "—"}</p>
+                </td>
+                <td className="max-w-[200px] px-4 py-3 align-middle text-slate-600">
+                  <p className="line-clamp-2 leading-snug">{String(row.formation ?? "") || "—"}</p>
+                </td>
+                <td className="max-w-[160px] px-4 py-3 align-middle">
+                  <TeamWebsiteCell website={String(row.website ?? "")} />
                 </td>
                 <td className="px-4 py-3 align-middle">
                   <div className="flex justify-end gap-2">

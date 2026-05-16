@@ -7,6 +7,8 @@ const teamSchema = new Schema(
     name: { type: String, required: true, trim: true },
     phone: { type: String, default: "", trim: true },
     email: { type: String, default: "", trim: true, lowercase: true },
+    website: { type: String, default: "", trim: true },
+    formation: { type: String, default: "" },
     description: { type: String, default: "" },
     imageUrl: { type: String, default: "" },
   },

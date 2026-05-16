@@ -16,6 +16,7 @@ import {
 import { apiFetch } from "@/api/client";
 import { buildWhatsAppUrl, COMPANY_WHATSAPP_DIGITS } from "@/lib/contactReply";
 import { HeroBackgroundSlider, HeroSliderDots } from "@/components/home/HeroBackgroundSlider";
+import { InfrastructureGallery } from "@/components/infrastructure/InfrastructureGallery";
 import { HERO_SLIDE_COUNT } from "@/components/home/heroSlides";
 
 type SiteConfig = {
@@ -93,7 +94,7 @@ function LogoMarquee<T extends { _id: string }>({
 export function Home() {
   const { t, i18n } = useTranslation();
   const [heroSlide, setHeroSlide] = useState(0);
-  /** Blocs édités en admin sont en français ; les autres langues lisent les fichiers i18n. */
+  /** Blocs Ã©ditÃ©s en admin sont en franÃ§ais ; les autres langues lisent les fichiers i18n. */
   const useFrenchCms = i18n.resolvedLanguage?.startsWith("fr") ?? false;
 
   useEffect(() => {
@@ -470,46 +471,13 @@ export function Home() {
         </div>
       </section>
 
-      <section className="bg-slate-50 py-20">
-        <div className="mx-auto max-w-7xl px-4 text-center">
-          <span className="text-xs font-bold uppercase tracking-widest text-sky-700">
-            {t("home.infrastructureKicker")}
-          </span>
-          <h2 className="mt-3 font-[family-name:var(--font-display)] text-3xl text-[color:var(--color-gt-navy)]">
-            {t("home.infrastructureTitle")}
-          </h2>
-          <div className="mx-auto mt-10 min-h-[120px] rounded-xl border-2 border-dashed border-slate-300 bg-white p-4 md:p-6">
-            {infrastructures.length === 0 ? (
-              <p className="text-slate-500">{t("home.infrastructureEmpty")}</p>
-            ) : (
-              <LogoMarquee
-                items={infrastructures}
-                durationSec={28}
-                renderItem={(infra) => {
-                  return (
-                    <div className="mx-2 flex w-[78vw] max-w-[340px] min-w-[240px] shrink-0 flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white text-left shadow-sm sm:mx-3 sm:w-[300px]">
-                      <div className="relative aspect-[16/9] w-full bg-slate-100">
-                        {infra.imageUrl ? (
-                          <img src={infra.imageUrl} alt={infra.name} className="h-full w-full object-cover" />
-                        ) : (
-                          <div className="flex h-full w-full items-center justify-center text-sm text-slate-400">
-                            {t("home.imagePlaceholder")}
-                          </div>
-                        )}
-                      </div>
-                      <div className="flex min-h-[92px] flex-col p-4 sm:min-h-[108px]">
-                        <span className="line-clamp-2 break-words text-base font-semibold text-[color:var(--color-gt-navy)]">
-                          {infra.name}
-                        </span>
-                      </div>
-                    </div>
-                  );
-                }}
-              />
-            )}
-          </div>
-        </div>
-      </section>
+      <InfrastructureGallery
+        variant="home"
+        items={infrastructures}
+        kicker={t("home.infrastructureKicker")}
+        title={t("home.infrastructureTitle")}
+        emptyText={t("home.infrastructureEmpty")}
+      />
 
       <section className="relative overflow-hidden bg-gradient-to-b from-[#040a14] via-[color:var(--color-gt-navy)] to-[#040a14] py-20 text-white md:py-28">
         <div
