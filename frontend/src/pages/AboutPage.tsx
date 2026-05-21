@@ -12,19 +12,7 @@ import {
 import { Logo } from "@/components/brand/Logo";
 import { TeamEnterpriseShowcase } from "@/components/team/TeamEnterpriseShowcase";
 import { apiFetch } from "@/api/client";
-
-type TeamMember = {
-  _id: string;
-  order?: number;
-  title?: string;
-  name: string;
-  phone?: string;
-  email?: string;
-  website?: string;
-  formation?: string;
-  description?: string;
-  imageUrl?: string;
-};
+import { normalizeTeamMember } from "@/lib/teamUtils";
 
 type AboutConfig = {
   kicker?: string;
@@ -82,7 +70,10 @@ export function AboutPage() {
   const { t } = useTranslation();
   const { data: team = [] } = useQuery({
     queryKey: ["team"],
-    queryFn: () => apiFetch<TeamMember[]>("/api/team", { auth: false }),
+    queryFn: async () => {
+      const rows = await apiFetch<Record<string, unknown>[]>("/api/team", { auth: false });
+      return rows.map(normalizeTeamMember);
+    },
   });
   const { data: cfgRaw } = useQuery({
     queryKey: ["public-config"],
@@ -210,7 +201,7 @@ export function AboutPage() {
               </div>
             </article>
 
-            <article className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm md:p-8">
+            <article id="equipe" className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm md:p-8 scroll-mt-24">
               <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
                 <h2 className="font-[family-name:var(--font-display)] text-2xl font-bold text-[color:var(--color-gt-navy)]">
                   {about.expertsH2 ?? t("about.expertsH2")}
@@ -225,11 +216,7 @@ export function AboutPage() {
                   {about.teamEmptyText ?? t("publicPages.noContent")}
                 </p>
               ) : (
-                <TeamEnterpriseShowcase
-                  members={team}
-                  fallbackTitle={about.teamFallbackTitle}
-                  fallbackDescription={about.teamFallbackDescription}
-                />
+                <TeamEnterpriseShowcase members={team} />
               )}
             </article>
           </div>

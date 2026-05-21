@@ -17,6 +17,7 @@ import { apiFetch } from "@/api/client";
 import { buildWhatsAppUrl, COMPANY_WHATSAPP_DIGITS } from "@/lib/contactReply";
 import { HeroBackgroundSlider, HeroSliderDots } from "@/components/home/HeroBackgroundSlider";
 import { InfrastructureGallery } from "@/components/infrastructure/InfrastructureGallery";
+import { TeamHomeSection } from "@/components/team/TeamHomeSection";
 import { HERO_SLIDE_COUNT } from "@/components/home/heroSlides";
 
 type SiteConfig = {
@@ -470,6 +471,8 @@ export function Home() {
           </div>
         </div>
       </section>
+
+      <TeamHomeSection />
 
       <InfrastructureGallery
         variant="home"

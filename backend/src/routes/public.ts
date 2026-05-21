@@ -140,7 +140,10 @@ publicRouter.get("/news/:slug", async (req, res, next) => {
 
 publicRouter.get("/team", async (_req, res, next) => {
   try {
-    const items = await Team.find().sort({ order: 1, createdAt: -1 });
+    const items = await Team.find()
+      .select("order title name phone email website formation description imageUrl")
+      .sort({ order: 1, createdAt: -1 })
+      .lean();
     res.json(items);
   } catch (e) {
     next(e);
