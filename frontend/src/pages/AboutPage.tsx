@@ -1,7 +1,8 @@
 import { FaCheck } from "react-icons/fa";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
+import { useEffect } from "react";
 import {
   IoChatbubblesOutline,
   IoDocumentTextOutline,
@@ -68,7 +69,8 @@ const serviceCardKeys = [
 
 export function AboutPage() {
   const { t } = useTranslation();
-  const { data: team = [] } = useQuery({
+  const { hash } = useLocation();
+  const { data: team = [], isSuccess: teamReady } = useQuery({
     queryKey: ["team"],
     queryFn: async () => {
       const rows = await apiFetch<Record<string, unknown>[]>("/api/team", { auth: false });
@@ -90,6 +92,12 @@ export function AboutPage() {
         title: t(`about.${s.title}`),
         text: t(`about.${s.text}`),
       }));
+
+  useEffect(() => {
+    if (hash !== "#equipe" || !teamReady) return;
+    const el = document.getElementById("equipe");
+    el?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, [hash, teamReady, team.length]);
 
   return (
     <div className="min-h-screen w-full bg-slate-50">
@@ -150,7 +158,7 @@ export function AboutPage() {
       <section className="w-full px-4 pb-14 sm:px-6 lg:px-10 xl:px-16 2xl:px-24">
         <div className="grid gap-6 lg:grid-cols-12">
           <div className="space-y-6 lg:col-span-8">
-            <article id="team-section" className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm md:p-8">
+            <article id="mission" className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm md:p-8 scroll-mt-24">
               <h2 className="font-[family-name:var(--font-display)] text-3xl font-bold text-[color:var(--color-gt-navy)]">
                 {about.missionH2 ?? t("about.missionH2")}
               </h2>
