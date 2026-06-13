@@ -4,13 +4,8 @@ import { Link } from "react-router-dom";
 import { FaArrowRight } from "react-icons/fa";
 import { TeamHomeCarousel } from "@/components/team/TeamHomeCarousel";
 import { apiFetch } from "@/api/client";
-import { normalizeTeamMember } from "@/lib/teamUtils";
-
-type AboutTeamConfig = {
-  expertsH2?: string;
-  expertsBadge?: string;
-  teamEmptyText?: string;
-};
+import { parseAboutConfig } from "@/lib/aboutConfig";
+import { applyTeamFallbacks, normalizeTeamMember } from "@/lib/teamUtils";
 
 export function TeamHomeSection() {
   const { t } = useTranslation();
@@ -19,14 +14,19 @@ export function TeamHomeSection() {
     queryKey: ["public-config"],
     queryFn: () => apiFetch<Record<string, unknown>>("/api/config", { auth: false }),
   });
-  const about = ((cfgRaw?.about as AboutTeamConfig | undefined) ?? {}) as AboutTeamConfig;
+  const about = parseAboutConfig(cfgRaw?.about);
 
-  const { data: team = [], isLoading } = useQuery({
+  const { data: teamRaw = [], isLoading } = useQuery({
     queryKey: ["team"],
     queryFn: async () => {
       const rows = await apiFetch<Record<string, unknown>[]>("/api/team", { auth: false });
       return rows.map(normalizeTeamMember);
     },
+  });
+
+  const team = applyTeamFallbacks(teamRaw, {
+    title: about.teamFallbackTitle,
+    description: about.teamFallbackDescription,
   });
 
   const title = about.expertsH2?.trim() || t("home.teamTitle");

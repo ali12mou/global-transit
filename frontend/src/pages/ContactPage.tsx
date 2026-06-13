@@ -167,7 +167,7 @@ export function ContactPage() {
         </div>
       </section>
 
-      <footer className="border-t border-white/10 bg-[color:var(--color-gt-navy-deep)] px-4 py-12 text-white">
+      <footer className="gt-brand-blue-bg border-t border-white/10 px-4 py-12 text-white">
         <div className="mx-auto max-w-7xl">
           <h2 className="font-[family-name:var(--font-display)] text-xl font-semibold md:text-2xl">{t("contact.hqFooter")}</h2>
           <div className="mt-2 h-0.5 w-16 rounded-full bg-[color:var(--color-gt-accent-green)]" />

@@ -1,4 +1,4 @@
-import type { TeamShowcaseMember } from "@/components/team/TeamEnterpriseShowcase";
+import type { TeamShowcaseMember } from "@/components/team/TeamMemberCard";
 
 /** Normalise un membre renvoyé par l’API (Mongo) pour l’affichage public. */
 export function normalizeTeamMember(raw: Record<string, unknown>): TeamShowcaseMember {
@@ -22,4 +22,18 @@ export function resolveTeamImageUrl(url: string): string {
   if (!t) return "";
   if (t.startsWith("http://") || t.startsWith("https://") || t.startsWith("/")) return t;
   return `/uploads/${t.replace(/^\/+/, "")}`;
+}
+
+/** Applique les valeurs par défaut configurées dans l’admin (page À propos). */
+export function applyTeamFallbacks(
+  members: TeamShowcaseMember[],
+  fallbacks: { title?: string; description?: string }
+): TeamShowcaseMember[] {
+  const fbTitle = fallbacks.title?.trim() ?? "";
+  const fbDesc = fallbacks.description?.trim() ?? "";
+  return members.map((m) => ({
+    ...m,
+    title: m.title?.trim() || fbTitle,
+    description: m.description?.trim() || fbDesc,
+  }));
 }

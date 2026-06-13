@@ -35,7 +35,7 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-50 shadow-sm">
-      <div className="bg-[color:var(--color-gt-topbar)] text-white">
+      <div className="gt-brand-blue-bg text-white">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-2 text-sm">
           <div className="flex flex-wrap items-center gap-4 md:gap-6">
             <a href="mailto:info@gttsgroup.com" className="flex items-center gap-2 hover:opacity-90">

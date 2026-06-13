@@ -3,9 +3,12 @@
 @theme {
   --font-display: "Playfair Display", ui-serif, Georgia, serif;
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --color-gt-topbar: #1e2d24;
+  --color-gt-topbar: #003caa;
   --color-gt-navy: #0a1628;
-  --color-gt-navy-deep: #050d1a;
+  --color-gt-navy-deep: #00288c;
+  --color-gt-brand-blue: #003caa;
+  --color-gt-brand-blue-light: #0050c8;
+  --color-gt-brand-blue-dark: #00288c;
   --color-gt-blue: #0c2a5c;
   --color-gt-accent-green: #2e7d57;
   --color-gt-whatsapp: #25d366;
@@ -25,6 +28,15 @@ body {
 :lang(am),
 :lang(om) {
   font-family: "Noto Sans Ethiopic", "Segoe UI", sans-serif;
+}
+
+.gt-brand-blue-bg {
+  background: linear-gradient(
+    135deg,
+    var(--color-gt-brand-blue-light) 0%,
+    var(--color-gt-brand-blue) 48%,
+    var(--color-gt-brand-blue-dark) 100%
+  );
 }
 
 @keyframes gt-logo-marquee-scroll {

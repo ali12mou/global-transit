@@ -74,6 +74,10 @@ async function seed() {
         servicesH2: "Nos services",
         expertsH2: "Notre équipe d'experts",
         expertsBadge: "Professionnels certifiés",
+        teamEmptyText: "L'équipe sera bientôt présentée ici.",
+        teamFallbackTitle: "Expert Global Transit",
+        teamFallbackDescription:
+          "Professionnel expérimenté en transit, logistique et dédouanement sur le corridor Djibouti – Éthiopie.",
         experienceKicker: "Expérience",
         experienceYears: "15+",
         experienceText:
