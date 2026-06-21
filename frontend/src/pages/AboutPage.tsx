@@ -1,15 +1,13 @@
 import { FaCheck, FaArrowRight } from "react-icons/fa";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { Logo } from "@/components/brand/Logo";
 import { AboutStrengthsSection } from "@/components/about/AboutStrengthsSection";
 import { AboutSectionHeader } from "@/components/about/AboutSectionHeader";
-import { AboutTeamSection } from "@/components/about/AboutTeamSection";
 import { apiFetch } from "@/api/client";
 import { parseAboutConfig } from "@/lib/aboutConfig";
-import { applyTeamFallbacks, normalizeTeamMember } from "@/lib/teamUtils";
 
 const strengthKeys = [
   "strengthCommunication",
@@ -34,20 +32,12 @@ const SECTION_LINKS = [
   { id: "mission", labelKey: "about.navMission" },
   { id: "atouts", labelKey: "about.navStrengths" },
   { id: "services", labelKey: "about.navServices" },
-  { id: "equipe", labelKey: "about.navTeam" },
 ] as const;
 
 export function AboutPage() {
   const { t } = useTranslation();
   const { hash } = useLocation();
-
-  const { data: teamRaw = [], isLoading: teamLoading, isSuccess: teamReady } = useQuery({
-    queryKey: ["team"],
-    queryFn: async () => {
-      const rows = await apiFetch<Record<string, unknown>[]>("/api/team", { auth: false });
-      return rows.map(normalizeTeamMember);
-    },
-  });
+  const navigate = useNavigate();
 
   const { data: cfgRaw } = useQuery({
     queryKey: ["public-config"],
@@ -55,11 +45,6 @@ export function AboutPage() {
   });
 
   const about = parseAboutConfig(cfgRaw?.about);
-
-  const team = applyTeamFallbacks(teamRaw, {
-    title: about.teamFallbackTitle,
-    description: about.teamFallbackDescription,
-  });
 
   const strengths = about.strengths?.length
     ? about.strengths.filter((s) => !isRemovedStrength(s))
@@ -73,10 +58,8 @@ export function AboutPage() {
       }));
 
   useEffect(() => {
-    if (hash !== "#equipe" || !teamReady) return;
-    const el = document.getElementById("equipe");
-    el?.scrollIntoView({ behavior: "smooth", block: "start" });
-  }, [hash, teamReady, team.length]);
+    if (hash === "#equipe") navigate("/equipe", { replace: true });
+  }, [hash, navigate]);
 
   return (
     <div className="min-h-screen w-full bg-slate-50">
@@ -234,13 +217,26 @@ export function AboutPage() {
                   <FaArrowRight className="h-3.5 w-3.5" aria-hidden />
                 </Link>
               </div>
+
+              <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+                <h3 className="font-[family-name:var(--font-display)] text-lg font-semibold text-[color:var(--color-gt-navy)]">
+                  {t("about.expertsH2")}
+                </h3>
+                <p className="mt-3 text-sm leading-relaxed text-slate-600">
+                  {about.teamFallbackDescription?.trim() || t("about.teamSubtitle")}
+                </p>
+                <Link
+                  to="/equipe"
+                  className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-[color:var(--color-gt-brand-blue)] hover:underline"
+                >
+                  {t("home.teamViewAll")}
+                  <FaArrowRight className="h-3.5 w-3.5" aria-hidden />
+                </Link>
+              </div>
             </div>
           </aside>
         </div>
       </section>
-
-      {/* Équipe — pleine largeur, données API + config admin */}
-      <AboutTeamSection members={team} about={about} isLoading={teamLoading} />
     </div>
   );
 }

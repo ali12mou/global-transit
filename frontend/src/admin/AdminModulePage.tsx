@@ -16,6 +16,7 @@ export function AdminModulePage({ module }: { module: EntityModule }) {
   const qc = useQueryClient();
   const [editing, setEditing] = useState<Row | null>(null);
   const [creating, setCreating] = useState(false);
+  const [teamFormMode, setTeamFormMode] = useState<"compact" | "standard">("standard");
 
   const { data = [], isLoading, error } = useQuery({
     queryKey: ["admin", module.api],
@@ -82,6 +83,19 @@ export function AdminModulePage({ module }: { module: EntityModule }) {
   const isInfrastructure = module.route === "infrastructures";
   const isTeam = module.route === "team";
 
+  const compactTeamRows = useMemo(
+    () => (isTeam ? data.filter((row) => String(row.layout ?? "standard") === "compact") : []),
+    [data, isTeam]
+  );
+  const standardTeamRows = useMemo(
+    () => (isTeam ? data.filter((row) => String(row.layout ?? "standard") !== "compact") : []),
+    [data, isTeam]
+  );
+  const activeTeamFields =
+    teamFormMode === "compact"
+      ? module.teamCompactFields ?? module.fields
+      : module.teamStandardFields ?? module.fields;
+
   if (isLoading) return <p className="text-slate-600">Chargement…</p>;
   if (error) return <p className="text-red-700">{(error as Error).message}</p>;
 
@@ -107,17 +121,26 @@ export function AdminModulePage({ module }: { module: EntityModule }) {
               <code className="rounded bg-slate-100 px-1">**Titre:** texte</code>.
             </p>
           )}
+          {isTeam && (
+            <p className="mt-1 max-w-3xl text-sm text-slate-600">
+              Gérez l&apos;organigramme direction (cartes sur{" "}
+              <code className="rounded bg-slate-100 px-1.5 py-0.5 text-xs">/equipe</code> — nom, titre, WhatsApp,
+              email) et les membres avec photo (cartes détaillées).
+            </p>
+          )}
         </div>
-        <button
-          type="button"
-          onClick={() => {
-            setCreating(true);
-            setEditing(null);
-          }}
-          className="rounded-lg bg-[color:var(--color-gt-blue)] px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:opacity-95"
-        >
-          Ajouter
-        </button>
+        {!isTeam ? (
+          <button
+            type="button"
+            onClick={() => {
+              setCreating(true);
+              setEditing(null);
+            }}
+            className="rounded-lg bg-[color:var(--color-gt-blue)] px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:opacity-95"
+          >
+            Ajouter
+          </button>
+        ) : null}
       </div>
 
       {isServices ? (
@@ -165,16 +188,78 @@ export function AdminModulePage({ module }: { module: EntityModule }) {
           }}
         />
       ) : isTeam ? (
-        <TeamTable
-          rows={data}
-          onEdit={(row) => {
-            setEditing(row);
-            setCreating(false);
-          }}
-          onDelete={(id) => {
-            if (confirm("Supprimer ce membre ?")) delMut.mutate(id);
-          }}
-        />
+        <div className="mt-8 space-y-10">
+          <section>
+            <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
+              <div>
+                <h2 className="font-[family-name:var(--font-display)] text-lg font-semibold text-[color:var(--color-gt-navy)]">
+                  Organigramme direction
+                </h2>
+                <p className="mt-1 text-sm text-slate-600">
+                  Bloc hiérarchique en bas de <code className="rounded bg-slate-100 px-1">/equipe</code> — ordre 100 =
+                  carte PDG en haut.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setTeamFormMode("compact");
+                  setCreating(true);
+                  setEditing(null);
+                }}
+                className="rounded-lg bg-[color:var(--color-gt-blue)] px-4 py-2 text-sm font-semibold text-white shadow-sm hover:opacity-95"
+              >
+                Ajouter un contact direction
+              </button>
+            </div>
+            <TeamLeadershipTable
+              rows={compactTeamRows}
+              onEdit={(row) => {
+                setTeamFormMode("compact");
+                setEditing(row);
+                setCreating(false);
+              }}
+              onDelete={(id) => {
+                if (confirm("Supprimer ce contact direction ?")) delMut.mutate(id);
+              }}
+            />
+          </section>
+
+          <section>
+            <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
+              <div>
+                <h2 className="font-[family-name:var(--font-display)] text-lg font-semibold text-[color:var(--color-gt-navy)]">
+                  Équipe avec photo
+                </h2>
+                <p className="mt-1 text-sm text-slate-600">
+                  Cartes membres avec photo, description et coordonnées complètes.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setTeamFormMode("standard");
+                  setCreating(true);
+                  setEditing(null);
+                }}
+                className="rounded-lg border border-[color:var(--color-gt-blue)] bg-white px-4 py-2 text-sm font-semibold text-[color:var(--color-gt-blue)] shadow-sm hover:bg-slate-50"
+              >
+                Ajouter un membre avec photo
+              </button>
+            </div>
+            <TeamPhotoTable
+              rows={standardTeamRows}
+              onEdit={(row) => {
+                setTeamFormMode("standard");
+                setEditing(row);
+                setCreating(false);
+              }}
+              onDelete={(id) => {
+                if (confirm("Supprimer ce membre ?")) delMut.mutate(id);
+              }}
+            />
+          </section>
+        </div>
       ) : (
         <div className="mt-6 overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-sm">
           <table className="min-w-full text-left text-sm">
@@ -227,14 +312,33 @@ export function AdminModulePage({ module }: { module: EntityModule }) {
       {(creating || editing) && (
         <EntityForm
           module={module}
+          fields={isTeam ? activeTeamFields : module.fields}
+          formTitle={
+            isTeam
+              ? editing
+                ? teamFormMode === "compact"
+                  ? "Modifier — organigramme direction"
+                  : "Modifier — membre avec photo"
+                : teamFormMode === "compact"
+                  ? "Ajouter — organigramme direction"
+                  : "Ajouter — membre avec photo"
+              : undefined
+          }
+          hiddenValues={isTeam ? { layout: teamFormMode } : undefined}
           initial={editing}
           onClose={() => {
             setCreating(false);
             setEditing(null);
           }}
           onSave={(body) => {
-            const isRoles = module.route === "roles";
-            const parsed = isRoles ? parseRoleBody(body) : parseBody(module, body);
+            if (module.route === "roles") {
+              const parsed = parseRoleBody(body);
+              if (editing) saveMut.mutate({ id: editing._id, body: parsed });
+              else saveMut.mutate({ body: parsed });
+              return;
+            }
+            const parsed = parseBody(module, body, isTeam ? activeTeamFields : module.fields);
+            if (isTeam) parsed.layout = teamFormMode;
             if (editing) saveMut.mutate({ id: editing._id, body: parsed });
             else saveMut.mutate({ body: parsed });
           }}
@@ -523,7 +627,88 @@ function TeamWebsiteCell({ website }: { website: string }) {
   );
 }
 
-function TeamTable({
+function TeamLeadershipTable({
+  rows,
+  onEdit,
+  onDelete,
+}: {
+  rows: Row[];
+  onEdit: (row: Row) => void;
+  onDelete: (id: string) => void;
+}) {
+  return (
+    <div className="overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-[0_1px_3px_rgba(15,23,42,0.08)]">
+      <div className="overflow-x-auto">
+        <table className="min-w-[880px] w-full border-collapse text-left text-sm">
+          <thead>
+            <tr className="border-b border-slate-200 bg-gradient-to-b from-slate-50 to-slate-100/90">
+              <th className="w-20 px-3 py-3.5 text-center text-xs font-semibold uppercase tracking-wider text-slate-500">
+                Ordre
+              </th>
+              <th className="px-4 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-500">Nom</th>
+              <th className="px-4 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-500">Titre</th>
+              <th className="px-4 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-500">WhatsApp</th>
+              <th className="px-4 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-500">Email</th>
+              <th className="w-44 px-4 py-3.5 text-right text-xs font-semibold uppercase tracking-wider text-slate-500">
+                Actions
+              </th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-slate-100">
+            {rows.map((row) => (
+              <tr key={row._id} className="transition-colors hover:bg-slate-50/90">
+                <td className="px-3 py-3 text-center align-middle">
+                  <span className="inline-flex min-w-[2rem] items-center justify-center rounded-md bg-slate-100 px-2 py-1 text-xs font-semibold tabular-nums text-slate-700">
+                    {String(row.order ?? 0)}
+                  </span>
+                </td>
+                <td className="max-w-[220px] truncate px-4 py-3 align-middle font-semibold text-[color:var(--color-gt-navy)]">
+                  {String(row.name ?? "")}
+                </td>
+                <td className="max-w-[200px] truncate px-4 py-3 align-middle text-slate-700">
+                  {String(row.title ?? "") || "—"}
+                </td>
+                <td className="max-w-[160px] px-4 py-3 align-middle">
+                  <TeamPhoneCell phone={String(row.phone ?? "")} />
+                </td>
+                <td className="max-w-[220px] px-4 py-3 align-middle">
+                  <TeamEmailCell email={String(row.email ?? "")} />
+                </td>
+                <td className="px-4 py-3 align-middle">
+                  <div className="flex justify-end gap-2">
+                    <button
+                      type="button"
+                      onClick={() => onEdit(row)}
+                      className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-[color:var(--color-gt-blue)] hover:bg-slate-50"
+                    >
+                      <IoPencil className="h-4 w-4" aria-hidden />
+                      Modifier
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => onDelete(row._id)}
+                      className="inline-flex items-center gap-1 rounded-lg border border-red-100 bg-red-50/80 px-3 py-1.5 text-xs font-semibold text-red-700 hover:bg-red-100"
+                    >
+                      <IoTrashOutline className="h-4 w-4" aria-hidden />
+                      Supprimer
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      {rows.length === 0 && (
+        <p className="border-t border-slate-100 px-4 py-8 text-center text-sm text-slate-500">
+          Aucun contact direction. Ajoutez les cartes de l&apos;organigramme (nom, titre, WhatsApp, email).
+        </p>
+      )}
+    </div>
+  );
+}
+
+function TeamPhotoTable({
   rows,
   onEdit,
   onDelete,
@@ -542,7 +727,7 @@ function TeamTable({
               <th className="px-3 py-3.5 text-center text-xs font-semibold uppercase tracking-wider text-slate-500">Ordre</th>
               <th className="px-4 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-500">Titre</th>
               <th className="px-4 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-500">Nom</th>
-              <th className="px-4 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-500">Téléphone</th>
+              <th className="px-4 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-500">WhatsApp</th>
               <th className="px-4 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-500">Email</th>
               <th className="px-4 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-500">Description</th>
               <th className="px-4 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-500">Formation pro</th>
@@ -829,9 +1014,9 @@ function formatCell(v: unknown) {
   return String(v);
 }
 
-function parseBody(module: EntityModule, body: Record<string, unknown>) {
+function parseBody(module: EntityModule, body: Record<string, unknown>, fields = module.fields) {
   const out: Record<string, unknown> = {};
-  for (const f of module.fields) {
+  for (const f of fields) {
     const v = body[f.key];
     if (f.type === "number") out[f.key] = v === "" ? 0 : Number(v);
     else if (f.type === "checkbox") out[f.key] = Boolean(v);
@@ -870,6 +1055,9 @@ function parseRoleBody(body: Record<string, unknown>) {
 
 function EntityForm({
   module,
+  fields,
+  formTitle,
+  hiddenValues,
   initial,
   onClose,
   onSave,
@@ -877,15 +1065,20 @@ function EntityForm({
   error,
 }: {
   module: EntityModule;
+  fields?: FieldDef[];
+  formTitle?: string;
+  hiddenValues?: Record<string, string>;
   initial: Row | null;
   onClose: () => void;
   onSave: (body: Record<string, unknown>) => void;
   loading: boolean;
   error: Error | null;
 }) {
+  const formFields = fields ?? module.fields;
+
   const defaults = useMemo(() => {
     const o: Record<string, unknown> = {};
-    for (const f of module.fields) {
+    for (const f of formFields) {
       if (f.type === "checkbox") o[f.key] = false;
       else if (f.type === "number") o[f.key] = 0;
       else if (f.type === "select") o[f.key] = f.options?.[0] ?? "";
@@ -894,12 +1087,15 @@ function EntityForm({
     if (!initial && module.route === "news") {
       o.published = true;
     }
+    if (!initial && hiddenValues?.layout === "compact") {
+      o.order = 100;
+    }
     if (!initial) return o;
     const merged = { ...o, ...initial };
     if (module.route === "roles" && Array.isArray(initial.permissions)) {
       merged.permissions = (initial.permissions as string[]).join("\n");
     }
-    for (const f of module.fields) {
+    for (const f of formFields) {
       if (f.type === "datetime-local" && initial[f.key]) {
         const d = new Date(String(initial[f.key]));
         if (!Number.isNaN(d.getTime())) {
@@ -908,13 +1104,13 @@ function EntityForm({
       }
     }
     return merged;
-  }, [initial, module.fields, module.route]);
+  }, [initial, formFields, module.route, hiddenValues?.layout]);
 
   function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
     const body: Record<string, unknown> = {};
-    for (const f of module.fields) {
+    for (const f of formFields) {
       if (f.type === "checkbox") {
         body[f.key] = fd.get(f.key) === "on";
       } else {
@@ -930,7 +1126,7 @@ function EntityForm({
         className={`max-h-[90vh] w-full overflow-y-auto rounded-2xl border border-slate-200/80 bg-white p-6 shadow-2xl shadow-slate-900/10 ${module.route === "news" ? "max-w-2xl" : "max-w-lg"}`}
       >
         <h2 className="text-lg font-semibold text-[color:var(--color-gt-navy)]">
-          {initial ? "Modifier" : "Créer"}
+          {formTitle ?? (initial ? "Modifier" : "Créer")}
         </h2>
         {module.route === "news" && (
           <p className="mt-2 text-xs leading-relaxed text-slate-600">
@@ -940,7 +1136,12 @@ function EntityForm({
         )}
         {error && <p className="mt-2 text-sm text-red-700">{error.message}</p>}
         <form onSubmit={onSubmit} className="mt-4 space-y-4">
-          {module.fields.map((f) => (
+          {hiddenValues
+            ? Object.entries(hiddenValues).map(([key, value]) => (
+                <input key={key} type="hidden" name={key} value={value} />
+              ))
+            : null}
+          {formFields.map((f) => (
             <FieldControl key={f.key} field={f} defaults={defaults} />
           ))}
           <div className="flex flex-wrap gap-2 pt-2">

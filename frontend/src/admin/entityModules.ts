@@ -27,6 +27,10 @@ export type EntityModule = {
   title: string;
   api: string;
   fields: FieldDef[];
+  /** Champs formulaire / tableau — organigramme direction (layout compact) */
+  teamCompactFields?: FieldDef[];
+  /** Champs formulaire / tableau — cartes avec photo (layout standard) */
+  teamStandardFields?: FieldDef[];
 };
 
 export const entityModules: EntityModule[] = [
@@ -137,18 +141,43 @@ export const entityModules: EntityModule[] = [
     route: "team",
     title: "Équipe",
     api: "/api/admin/team",
-    fields: [
-      { key: "order", label: "Ordre", type: "number" },
-      { key: "title", label: "Titre", type: "text" },
+    teamCompactFields: [
+      { key: "order", label: "Ordre (100 = PDG en haut de l’organigramme)", type: "number" },
       { key: "name", label: "Nom", type: "text" },
-      { key: "phone", label: "Téléphone (WhatsApp)", type: "text" },
+      { key: "title", label: "Titre / Fonction", type: "text" },
+      { key: "phone", label: "WhatsApp", type: "text" },
+      { key: "email", label: "Email", type: "text" },
+    ],
+    teamStandardFields: [
+      { key: "order", label: "Ordre", type: "number" },
+      { key: "title", label: "Titre / Fonction", type: "text" },
+      { key: "name", label: "Nom", type: "text" },
+      { key: "phone", label: "WhatsApp / Téléphone", type: "text" },
       { key: "email", label: "Email", type: "text" },
       { key: "website", label: "Profil web pro (LinkedIn, site…)", type: "text" },
       { key: "formation", label: "Formation professionnelle", type: "textarea" },
       { key: "description", label: "Description", type: "textarea" },
       {
         key: "imageUrl",
-        label: "Image",
+        label: "Photo",
+        type: "file-image",
+        uploadCategory: "team",
+      },
+    ],
+    fields: [
+      { key: "order", label: "Ordre", type: "number" },
+      { key: "title", label: "Titre", type: "text" },
+      { key: "name", label: "Nom", type: "text" },
+      { key: "phone", label: "WhatsApp", type: "text" },
+      { key: "fax", label: "Ligne fixe / Bureau", type: "text" },
+      { key: "email", label: "Email", type: "text" },
+      { key: "website", label: "Profil web pro (LinkedIn, site…)", type: "text" },
+      { key: "layout", label: "Affichage", type: "select", options: ["standard", "compact"] },
+      { key: "formation", label: "Formation professionnelle", type: "textarea" },
+      { key: "description", label: "Description", type: "textarea" },
+      {
+        key: "imageUrl",
+        label: "Photo",
         type: "file-image",
         uploadCategory: "team",
       },

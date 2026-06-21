@@ -10,9 +10,11 @@ type Props = {
   members: TeamShowcaseMember[];
   about: AboutConfig;
   isLoading?: boolean;
+  /** Masque l’en-tête lorsque le hero de page équipe l’affiche déjà */
+  hideHeader?: boolean;
 };
 
-export function AboutTeamSection({ members, about, isLoading }: Props) {
+export function AboutTeamSection({ members, about, isLoading, hideHeader }: Props) {
   const { t } = useTranslation();
 
   const title = about.expertsH2?.trim() || t("about.expertsH2");
@@ -24,7 +26,7 @@ export function AboutTeamSection({ members, about, isLoading }: Props) {
   return (
     <section
       id="equipe"
-      className="relative scroll-mt-24 overflow-hidden border-t border-slate-200/80 bg-gradient-to-b from-slate-100/80 via-white to-slate-50 py-16 md:py-24"
+      className={`relative scroll-mt-24 overflow-hidden bg-gradient-to-b from-slate-100/80 via-white to-slate-50 ${hideHeader ? "border-t-0 py-12 md:py-16" : "border-t border-slate-200/80 py-16 md:py-24"}`}
     >
       <div
         className="pointer-events-none absolute inset-0 opacity-[0.4]"
@@ -38,31 +40,33 @@ export function AboutTeamSection({ members, about, isLoading }: Props) {
       <div className="pointer-events-none absolute -left-16 bottom-0 h-64 w-64 rounded-full bg-[color:var(--color-gt-blue)]/10 blur-3xl" />
 
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-          <AboutSectionHeader
-            kicker={t("about.teamKicker")}
-            title={title}
-            badge={badge}
-            subtitle={subtitle || undefined}
-          />
-          {!isLoading && members.length > 0 ? (
-            <div className="flex shrink-0 items-center gap-3 rounded-2xl border border-slate-200/90 bg-white px-5 py-4 shadow-sm">
-              <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-[color:var(--color-gt-navy)] text-white shadow-sm">
-                <FaUsers className="h-5 w-5" aria-hidden />
-              </span>
-              <div>
-                <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                  {t("about.teamCountLabel")}
-                </p>
-                <p className="font-[family-name:var(--font-display)] text-2xl font-bold text-[color:var(--color-gt-navy)]">
-                  {t("about.teamCount", { count: members.length, defaultValue: `${members.length}` })}
-                </p>
+        {!hideHeader ? (
+          <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+            <AboutSectionHeader
+              kicker={t("about.teamKicker")}
+              title={title}
+              badge={badge}
+              subtitle={subtitle || undefined}
+            />
+            {!isLoading && members.length > 0 ? (
+              <div className="flex shrink-0 items-center gap-3 rounded-2xl border border-slate-200/90 bg-white px-5 py-4 shadow-sm">
+                <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-[color:var(--color-gt-navy)] text-white shadow-sm">
+                  <FaUsers className="h-5 w-5" aria-hidden />
+                </span>
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                    {t("about.teamCountLabel")}
+                  </p>
+                  <p className="font-[family-name:var(--font-display)] text-2xl font-bold text-[color:var(--color-gt-navy)]">
+                    {t("about.teamCount", { count: members.length, defaultValue: `${members.length}` })}
+                  </p>
+                </div>
               </div>
-            </div>
-          ) : null}
-        </div>
+            ) : null}
+          </div>
+        ) : null}
 
-        <div className="mt-12">
+        <div className={hideHeader ? "" : "mt-12"}>
           {isLoading ? (
             <div className="grid grid-cols-1 place-items-center gap-8 sm:grid-cols-2 xl:grid-cols-3">
               {[0, 1, 2].map((i) => (

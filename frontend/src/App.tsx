@@ -3,6 +3,7 @@ import { MainLayout } from "./layouts/MainLayout";
 import { ContactLayout } from "./layouts/ContactLayout";
 import { Home } from "./pages/Home";
 import { AboutPage } from "./pages/AboutPage";
+import { TeamPage } from "./pages/TeamPage";
 import { ContactPage } from "./pages/ContactPage";
 import { AdminLayout } from "./admin/AdminLayout";
 import { AdminLogin } from "./admin/AdminLogin";
@@ -27,8 +28,8 @@ export function App() {
       <Route element={<MainLayout />}>
         <Route index element={<Home />} />
         <Route path="a-propos" element={<AboutPage />} />
-        <Route path="about" element={<Navigate to="/a-propos#equipe" replace />} />
-        <Route path="equipe" element={<Navigate to="/a-propos#equipe" replace />} />
+        <Route path="equipe" element={<TeamPage />} />
+        <Route path="about" element={<Navigate to="/a-propos" replace />} />
         <Route path="activites" element={<ActivitiesPage />} />
         <Route path="projets/:slug" element={<ProjectDetailPage />} />
         <Route path="projets" element={<ProjectsPage />} />

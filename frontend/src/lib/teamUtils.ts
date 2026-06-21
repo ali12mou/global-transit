@@ -9,11 +9,13 @@ export function normalizeTeamMember(raw: Record<string, unknown>): TeamShowcaseM
     title: String(raw.title ?? "").trim(),
     name: String(raw.name ?? "").trim() || "—",
     phone: String(raw.phone ?? "").trim(),
+    fax: String(raw.fax ?? "").trim(),
     email: String(raw.email ?? "").trim(),
     website: String(raw.website ?? "").trim(),
     formation: String(raw.formation ?? "").trim(),
     description: String(raw.description ?? "").trim(),
     imageUrl: resolveTeamImageUrl(String(raw.imageUrl ?? "")),
+    layout: raw.layout === "compact" ? "compact" : "standard",
   };
 }
 

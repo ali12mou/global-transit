@@ -31,7 +31,7 @@ export function NavServicesMenu({
       { to: "/activites", label: t("nav.activities") },
       { to: "/projets", label: t("nav.projects") },
       { to: "/infrastructures", label: t("nav.infrastructure") },
-      { to: "/a-propos", label: t("nav.team"), hash: "#equipe" },
+      { to: "/equipe", label: t("nav.team") },
     ],
     [t]
   );

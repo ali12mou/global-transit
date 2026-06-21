@@ -16,11 +16,13 @@ export type TeamShowcaseMember = {
   title?: string;
   name: string;
   phone?: string;
+  fax?: string;
   email?: string;
   website?: string;
   formation?: string;
   description?: string;
   imageUrl?: string;
+  layout?: "standard" | "compact";
 };
 
 /** Largeur et ratio image identiques sur accueil et page À propos */

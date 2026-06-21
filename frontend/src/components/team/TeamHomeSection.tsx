@@ -72,7 +72,7 @@ export function TeamHomeSection() {
               <TeamHomeCarousel members={team} />
               <div className="mt-10 flex justify-center">
                 <Link
-                  to="/a-propos#equipe"
+                  to="/equipe"
                   className="inline-flex items-center gap-2 rounded-lg bg-[color:var(--color-gt-navy)] px-6 py-2.5 text-sm font-semibold text-white shadow-md transition hover:bg-[color:var(--color-gt-blue)]"
                 >
                   {t("home.teamViewAll")}

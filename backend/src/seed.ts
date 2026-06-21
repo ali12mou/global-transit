@@ -117,6 +117,69 @@ async function seed() {
   }
 
   await Team.updateMany({ order: { $exists: false } }, { $set: { order: 0 } });
+  await Team.updateMany({ layout: { $exists: false } }, { $set: { layout: "standard" } });
+
+  await Team.deleteMany({
+    layout: "compact",
+    name: { $in: ["Direction générale", "Responsable des opérations"] },
+  });
+
+  const leadershipTeam = [
+    {
+      order: 100,
+      layout: "compact",
+      title: "PDG",
+      name: "Monsieur Mohamed Adour",
+      phone: "+253 21 35 14 55",
+      fax: "+253 21 35 77 48",
+      email: "",
+    },
+    {
+      order: 101,
+      layout: "compact",
+      title: "Directeur général du groupe",
+      name: "Monsieur Steve Morrall",
+      phone: "+253 21 35 14 55",
+      fax: "+253 21 35 77 48",
+      email: "steve.morrall@globaltransit.dj",
+    },
+    {
+      order: 102,
+      layout: "compact",
+      title: "Responsable logistique",
+      name: "Monsieur Mohamed Idriss",
+      phone: "+253 21 35 14 55",
+      fax: "+253 21 35 77 48",
+      email: "mohamed.idriss@globaltransit.dj",
+    },
+    {
+      order: 103,
+      layout: "compact",
+      title: "Responsable des opérations",
+      name: "Monsieur Ibrahim Ismail",
+      phone: "+253 21 35 14 55",
+      fax: "+253 21 35 77 48",
+      email: "ibrahim.ismail@globaltransit.dj",
+    },
+    {
+      order: 104,
+      layout: "compact",
+      title: "Responsable du développement commercial",
+      name: "M. Warsama D. Ibrahim",
+      phone: "+253 21 35 14 55",
+      fax: "+253 21 35 77 48",
+      email: "warsama.ibrahim@globaltransit.dj",
+    },
+  ];
+
+  for (const member of leadershipTeam) {
+    await Team.findOneAndUpdate(
+      { layout: "compact", name: member.name },
+      { $set: member },
+      { upsert: true }
+    );
+  }
+  console.log("Organigramme direction (équipe compacte) synchronisé.");
 
   const opsCount = await ActivityOperation.countDocuments();
   if (opsCount === 0) {
