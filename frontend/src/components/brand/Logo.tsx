@@ -8,12 +8,13 @@ type LogoProps = {
 };
 
 /**
- * Blason (`/logo-mark.png`) + nom distinct « Global Transit » / « Transport & Service ».
- * Le fichier mark doit idéalement être l’emblème seul ; en secours : `/logo.svg`.
+ * Blason (`/logo-mark.png` ou `/logo-mark.svg`) + nom distinct « Global Transit » / « Transport & Service ».
  */
 export function Logo({ variant = "header", className = "" }: LogoProps) {
   const { t } = useTranslation();
-  const [markSrc, setMarkSrc] = useState("/logo-mark.png");
+  const markSources = ["/logo-mark.png", "/logo-mark.svg", "/logo.svg"] as const;
+  const [markIndex, setMarkIndex] = useState(0);
+  const markSrc = markSources[Math.min(markIndex, markSources.length - 1)]!;
 
   const line1Class =
     variant === "footer" || variant === "admin"
@@ -50,7 +51,7 @@ export function Logo({ variant = "header", className = "" }: LogoProps) {
       alt=""
       width={160}
       height={64}
-      onError={() => setMarkSrc("/logo.svg")}
+      onError={() => setMarkIndex((i) => Math.min(i + 1, markSources.length - 1))}
       className={`${markSize} shrink-0 object-contain object-left`}
       loading="eager"
       decoding="async"
