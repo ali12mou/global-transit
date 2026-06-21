@@ -5,13 +5,11 @@ import {
   IoFolderOpenOutline,
   IoGridOutline,
   IoInformationCircleOutline,
-  IoLayersOutline,
   IoLinkOutline,
   IoMailOutline,
   IoNewspaperOutline,
   IoPeopleOutline,
   IoPersonOutline,
-  IoRibbonOutline,
   IoServerOutline,
   IoSettingsOutline,
   IoShieldOutline,
@@ -25,9 +23,7 @@ export type AdminNavItem = {
 
 export const adminNavItems: AdminNavItem[] = [
   { to: "/admin", labelKey: "admin.nav.dashboard", Icon: IoGridOutline },
-  { to: "/admin/activity-operations", labelKey: "admin.nav.operations", Icon: IoLayersOutline },
   { to: "/admin/activity-services", labelKey: "admin.nav.services", Icon: IoCubeOutline },
-  { to: "/admin/careers", labelKey: "admin.nav.careers", Icon: IoRibbonOutline },
   { to: "/admin/clients", labelKey: "admin.nav.clients", Icon: IoBusinessOutline },
   { to: "/admin/infrastructures", labelKey: "admin.nav.infrastructure", Icon: IoServerOutline },
   { to: "/admin/contacts", labelKey: "admin.nav.contacts", Icon: IoMailOutline },

@@ -31,30 +31,12 @@ export type EntityModule = {
 
 export const entityModules: EntityModule[] = [
   {
-    route: "activity-operations",
-    title: "Opérations",
-    api: "/api/admin/activity-operations",
-    fields: [
-      { key: "title", label: "Titre", type: "text" },
-      { key: "slug", label: "Slug", type: "text" },
-      { key: "content", label: "Contenu", type: "textarea" },
-      {
-        key: "imageUrl",
-        label: "Image",
-        type: "file-image",
-        uploadCategory: "operations",
-      },
-      { key: "order", label: "Ordre", type: "number" },
-      { key: "published", label: "Publié", type: "checkbox" },
-    ],
-  },
-  {
     route: "activity-services",
     title: "Services",
     api: "/api/admin/activity-services",
     fields: [
       { key: "title", label: "Titre", type: "text" },
-      { key: "description", label: "Description", type: "textarea" },
+      { key: "description", label: "Description (intro + lignes « **Titre:** texte »)", type: "textarea" },
       {
         key: "imageUrl",
         label: "Image",
@@ -63,18 +45,6 @@ export const entityModules: EntityModule[] = [
       },
       { key: "order", label: "Ordre", type: "number" },
       { key: "published", label: "Publié", type: "checkbox" },
-    ],
-  },
-  {
-    route: "careers",
-    title: "Carrières",
-    api: "/api/admin/careers",
-    fields: [
-      { key: "title", label: "Titre", type: "text" },
-      { key: "location", label: "Lieu", type: "text" },
-      { key: "description", label: "Description", type: "textarea" },
-      { key: "publishedAt", label: "Publié le", type: "datetime-local" },
-      { key: "active", label: "Actif", type: "checkbox" },
     ],
   },
   {

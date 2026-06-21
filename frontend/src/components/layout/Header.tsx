@@ -10,6 +10,7 @@ import {
 } from "react-icons/fa";
 import { Logo } from "@/components/brand/Logo";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { MainNavLink, NavServicesMenu } from "@/components/layout/NavServicesMenu";
 import { buildWhatsAppUrl, COMPANY_WHATSAPP_DIGITS } from "@/lib/contactReply";
 
 export function Header() {
@@ -19,18 +20,6 @@ export function Header() {
   const companyWhatsAppUrl = useMemo(
     () => buildWhatsAppUrl(COMPANY_WHATSAPP_DIGITS, t("contact.whatsappPrefilledMessage")),
     [t, i18n.language]
-  );
-
-  const nav = useMemo(
-    () => [
-      { to: "/a-propos", label: t("nav.about") },
-      { to: "/activites", label: t("nav.activities") },
-      { to: "/projets", label: t("nav.projects") },
-      { to: "/infrastructures", label: t("nav.infrastructure") },
-      { to: "/actualites", label: t("nav.news") },
-      { to: "/contact", label: t("nav.contact") },
-    ],
-    [t]
   );
 
   return (
@@ -70,17 +59,11 @@ export function Header() {
           </Link>
 
           <nav className="hidden items-center gap-6 lg:flex">
-            {nav.map((item) => (
-              <NavLink
-                key={item.to}
-                to={item.to}
-                className={({ isActive }) =>
-                  `text-sm font-medium ${isActive ? "text-[color:var(--color-gt-blue)]" : "text-slate-700 hover:text-[color:var(--color-gt-blue)]"}`
-                }
-              >
-                {item.label}
-              </NavLink>
-            ))}
+            <MainNavLink to="/" label={t("nav.home")} end />
+            <MainNavLink to="/a-propos" label={t("nav.about")} />
+            <NavServicesMenu variant="desktop" />
+            <MainNavLink to="/actualites" label={t("nav.news")} />
+            <MainNavLink to="/contact" label={t("nav.contact")} />
           </nav>
 
           <div className="flex items-center gap-3">
@@ -108,16 +91,34 @@ export function Header() {
         {open && (
           <div className="border-t border-slate-200 bg-[#f5f6f4] px-4 py-4 lg:hidden">
             <nav className="flex flex-col gap-3">
-              {nav.map((item) => (
-                <NavLink
-                  key={item.to}
-                  to={item.to}
-                  onClick={() => setOpen(false)}
-                  className="text-base font-medium text-slate-800"
-                >
-                  {item.label}
-                </NavLink>
-              ))}
+              <MainNavLink
+                to="/"
+                label={t("nav.home")}
+                end
+                className="text-base"
+                onClick={() => setOpen(false)}
+              />
+              <MainNavLink
+                to="/a-propos"
+                label={t("nav.about")}
+                className="text-base"
+                onClick={() => setOpen(false)}
+              />
+              <NavServicesMenu variant="mobile" onNavigate={() => setOpen(false)} />
+              <NavLink
+                to="/actualites"
+                onClick={() => setOpen(false)}
+                className="text-base font-medium text-slate-800"
+              >
+                {t("nav.news")}
+              </NavLink>
+              <NavLink
+                to="/contact"
+                onClick={() => setOpen(false)}
+                className="text-base font-medium text-slate-800"
+              >
+                {t("nav.contact")}
+              </NavLink>
               <div className="flex items-center justify-between border-t border-slate-200 pt-3">
                 <LanguageSwitcher />
               </div>

@@ -44,6 +44,10 @@ export function AdminModulePage({ module }: { module: EntityModule }) {
       if (module.route === "team") {
         qc.invalidateQueries({ queryKey: ["team"] });
       }
+      if (module.route === "activity-services") {
+        qc.invalidateQueries({ queryKey: ["activity-services-page"] });
+        qc.invalidateQueries({ queryKey: ["activity-services"] });
+      }
       setEditing(null);
       setCreating(false);
     },
@@ -60,6 +64,10 @@ export function AdminModulePage({ module }: { module: EntityModule }) {
       if (module.route === "team") {
         qc.invalidateQueries({ queryKey: ["team"] });
       }
+      if (module.route === "activity-services") {
+        qc.invalidateQueries({ queryKey: ["activity-services-page"] });
+        qc.invalidateQueries({ queryKey: ["activity-services"] });
+      }
     },
   });
 
@@ -69,7 +77,6 @@ export function AdminModulePage({ module }: { module: EntityModule }) {
   }, [module.fields]);
 
   const isServices = module.route === "activity-services";
-  const isOperations = module.route === "activity-operations";
   const isPartners = module.route === "partners";
   const isNews = module.route === "news";
   const isInfrastructure = module.route === "infrastructures";
@@ -90,6 +97,14 @@ export function AdminModulePage({ module }: { module: EntityModule }) {
               Les entrées <strong className="text-slate-800">publiées</strong> sont listées sur la page publique{" "}
               <code className="rounded bg-slate-100 px-1.5 py-0.5 text-xs text-slate-800">/actualites</code> (API{" "}
               <code className="rounded bg-slate-100 px-1.5 py-0.5 text-xs">GET /api/news</code>).
+            </p>
+          )}
+          {isServices && (
+            <p className="mt-1 max-w-2xl text-sm text-slate-600">
+              Les services <strong className="text-slate-800">publiés</strong> s&apos;affichent sur{" "}
+              <code className="rounded bg-slate-100 px-1.5 py-0.5 text-xs text-slate-800">/activites</code> (menu
+              Services → Our Activities). Format description : paragraphe d&apos;intro, puis lignes{" "}
+              <code className="rounded bg-slate-100 px-1">**Titre:** texte</code>.
             </p>
           )}
         </div>
@@ -114,17 +129,6 @@ export function AdminModulePage({ module }: { module: EntityModule }) {
           }}
           onDelete={(id) => {
             if (confirm("Supprimer ce service ?")) delMut.mutate(id);
-          }}
-        />
-      ) : isOperations ? (
-        <OperationsTable
-          rows={data}
-          onEdit={(row) => {
-            setEditing(row);
-            setCreating(false);
-          }}
-          onDelete={(id) => {
-            if (confirm("Supprimer cette opération ?")) delMut.mutate(id);
           }}
         />
       ) : isPartners ? (
@@ -356,126 +360,6 @@ function ServicesTable({
       {rows.length === 0 && (
         <p className="border-t border-slate-100 px-4 py-8 text-center text-sm text-slate-500">
           Aucun service. Cliquez sur « Ajouter » et importez une image (fichier depuis votre ordinateur).
-        </p>
-      )}
-    </div>
-  );
-}
-
-function OperationsTable({
-  rows,
-  onEdit,
-  onDelete,
-}: {
-  rows: Row[];
-  onEdit: (row: Row) => void;
-  onDelete: (id: string) => void;
-}) {
-  return (
-    <div className="mt-6 overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-[0_1px_3px_rgba(15,23,42,0.08)]">
-      <div className="overflow-x-auto">
-        <table className="min-w-[720px] w-full border-collapse text-left text-sm">
-          <thead>
-            <tr className="border-b border-slate-200 bg-gradient-to-b from-slate-50 to-slate-100/90">
-              <th className="px-4 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-500">
-                Aperçu
-              </th>
-              <th className="px-4 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-500">
-                Titre
-              </th>
-              <th className="px-4 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-500">
-                Contenu
-              </th>
-              <th className="w-20 px-3 py-3.5 text-center text-xs font-semibold uppercase tracking-wider text-slate-500">
-                Ordre
-              </th>
-              <th className="w-28 px-3 py-3.5 text-center text-xs font-semibold uppercase tracking-wider text-slate-500">
-                Statut
-              </th>
-              <th className="w-40 px-4 py-3.5 text-right text-xs font-semibold uppercase tracking-wider text-slate-500">
-                Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-100">
-            {rows.map((row) => {
-              const img = String(row.imageUrl ?? "").trim();
-              const title = String(row.title ?? "");
-              const content = String(row.content ?? "");
-              const order = row.order ?? 0;
-              const published = Boolean(row.published);
-              return (
-                <tr key={row._id} className="transition-colors hover:bg-slate-50/90">
-                  <td className="px-4 py-3 align-middle">
-                    <div className="relative h-16 w-20 overflow-hidden rounded-xl bg-slate-100 ring-1 ring-slate-200/80">
-                      {img ? (
-                        <img
-                          src={img}
-                          alt=""
-                          className="h-full w-full object-cover"
-                          loading="lazy"
-                          onError={(e) => {
-                            (e.target as HTMLImageElement).style.display = "none";
-                          }}
-                        />
-                      ) : (
-                        <div className="flex h-full w-full items-center justify-center text-[10px] text-slate-400">
-                          Pas d&apos;image
-                        </div>
-                      )}
-                    </div>
-                  </td>
-                  <td className="max-w-[200px] px-4 py-3 align-middle">
-                    <span className="font-semibold text-[color:var(--color-gt-navy)]">{title}</span>
-                  </td>
-                  <td className="max-w-md px-4 py-3 align-middle text-slate-600">
-                    <p className="line-clamp-2 leading-snug">{content || "—"}</p>
-                  </td>
-                  <td className="px-3 py-3 text-center align-middle">
-                    <span className="inline-flex min-w-[2rem] items-center justify-center rounded-md bg-slate-100 px-2 py-1 text-xs font-semibold tabular-nums text-slate-700">
-                      {String(order)}
-                    </span>
-                  </td>
-                  <td className="px-3 py-3 text-center align-middle">
-                    <span
-                      className={`inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${
-                        published
-                          ? "bg-emerald-100 text-emerald-800 ring-1 ring-emerald-200/80"
-                          : "bg-slate-100 text-slate-600 ring-1 ring-slate-200"
-                      }`}
-                    >
-                      {published ? "Publié" : "Brouillon"}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 align-middle">
-                    <div className="flex items-center justify-end gap-2">
-                      <button
-                        type="button"
-                        onClick={() => onEdit(row)}
-                        className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-[color:var(--color-gt-blue)] shadow-sm hover:bg-slate-50"
-                      >
-                        <IoPencil className="h-4 w-4" aria-hidden />
-                        Modifier
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => onDelete(row._id)}
-                        className="inline-flex items-center gap-1.5 rounded-lg border border-red-100 bg-red-50/80 px-3 py-1.5 text-xs font-semibold text-red-700 hover:bg-red-100"
-                      >
-                        <IoTrashOutline className="h-4 w-4" aria-hidden />
-                        Supprimer
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
-      {rows.length === 0 && (
-        <p className="border-t border-slate-100 px-4 py-8 text-center text-sm text-slate-500">
-          Aucune opération. Cliquez sur « Ajouter » puis importez une image (JPEG, PNG, WebP…).
         </p>
       )}
     </div>

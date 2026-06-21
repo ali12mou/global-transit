@@ -3,35 +3,24 @@ import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
-import {
-  IoChatbubblesOutline,
-  IoDocumentTextOutline,
-  IoPeopleOutline,
-  IoStatsChartOutline,
-  IoRibbonOutline,
-} from "react-icons/io5";
 import { Logo } from "@/components/brand/Logo";
+import { AboutStrengthsSection } from "@/components/about/AboutStrengthsSection";
 import { AboutSectionHeader } from "@/components/about/AboutSectionHeader";
 import { AboutTeamSection } from "@/components/about/AboutTeamSection";
 import { apiFetch } from "@/api/client";
 import { parseAboutConfig } from "@/lib/aboutConfig";
 import { applyTeamFallbacks, normalizeTeamMember } from "@/lib/teamUtils";
 
-const strengthIcons = [
-  IoChatbubblesOutline,
-  IoPeopleOutline,
-  IoStatsChartOutline,
-  IoRibbonOutline,
-  IoDocumentTextOutline,
-] as const;
-
 const strengthKeys = [
   "strengthCommunication",
   "strengthTeamwork",
-  "strengthReporting",
   "strengthResponsibility",
-  "strengthFinalReport",
 ] as const;
+
+function isRemovedStrength(label: string): boolean {
+  const n = label.trim().toLowerCase();
+  return n.includes("reporting") || n.includes("rapport final") || n.includes("final report");
+}
 
 const serviceCardKeys = [
   { title: "svcLogisticsTitle", text: "svcLogisticsText" },
@@ -73,7 +62,7 @@ export function AboutPage() {
   });
 
   const strengths = about.strengths?.length
-    ? about.strengths
+    ? about.strengths.filter((s) => !isRemovedStrength(s))
     : strengthKeys.map((key) => t(`about.${key}`));
 
   const serviceCards = about.services?.length
@@ -185,37 +174,7 @@ export function AboutPage() {
               </div>
             </article>
 
-            {/* Points forts */}
-            <article
-              id="atouts"
-              className="scroll-mt-24 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm md:p-8"
-            >
-              <AboutSectionHeader
-                title={about.strengthsTitle ?? t("about.strengthsTitle")}
-                badge={about.standardsBadge ?? t("about.standardsBadge")}
-              />
-              <div className="mt-8 grid gap-3 sm:grid-cols-2">
-                {strengths.map((label, idx) => {
-                  const Icon = strengthIcons[idx % strengthIcons.length]!;
-                  return (
-                    <div
-                      key={`${label}-${idx}`}
-                      className="group flex items-center gap-4 rounded-2xl border border-slate-200 bg-slate-50/80 px-4 py-4 transition hover:border-[color:var(--color-gt-accent-green)]/30 hover:bg-white hover:shadow-md"
-                    >
-                      <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white text-[color:var(--color-gt-accent-green)] shadow-sm ring-1 ring-slate-200 transition group-hover:scale-105">
-                        <Icon className="h-5 w-5" aria-hidden />
-                      </span>
-                      <div className="min-w-0 flex-1">
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                          {String(idx + 1).padStart(2, "0")}
-                        </span>
-                        <p className="text-sm font-semibold text-slate-800">{label}</p>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </article>
+            <AboutStrengthsSection about={about} items={strengths} />
 
             {/* Services */}
             <article

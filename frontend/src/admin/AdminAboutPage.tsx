@@ -13,6 +13,8 @@ type AboutConfig = {
   missionP1?: string;
   missionP2?: string;
   strengthsTitle?: string;
+  strengthsKicker?: string;
+  strengthsIntro?: string;
   standardsBadge?: string;
   servicesH2?: string;
   expertsH2?: string;
@@ -41,6 +43,8 @@ type AboutForm = {
   missionP1: string;
   missionP2: string;
   strengthsTitle: string;
+  strengthsKicker: string;
+  strengthsIntro: string;
   standardsBadge: string;
   servicesH2: string;
   expertsH2: string;
@@ -72,6 +76,8 @@ function normalizeToForm(raw: AboutConfig): AboutForm {
     missionP1: raw.missionP1 ?? "",
     missionP2: raw.missionP2 ?? "",
     strengthsTitle: raw.strengthsTitle ?? "",
+    strengthsKicker: raw.strengthsKicker ?? "",
+    strengthsIntro: raw.strengthsIntro ?? "",
     standardsBadge: raw.standardsBadge ?? "",
     servicesH2: raw.servicesH2 ?? "",
     expertsH2: raw.expertsH2 ?? "",
@@ -118,6 +124,8 @@ function formToPayload(form: AboutForm): AboutConfig {
     missionP1: form.missionP1.trim(),
     missionP2: form.missionP2.trim(),
     strengthsTitle: form.strengthsTitle.trim(),
+    strengthsKicker: form.strengthsKicker.trim(),
+    strengthsIntro: form.strengthsIntro.trim(),
     standardsBadge: form.standardsBadge.trim(),
     servicesH2: form.servicesH2.trim(),
     expertsH2: form.expertsH2.trim(),
@@ -235,10 +243,17 @@ export function AdminAboutPage() {
 
         <section className="space-y-3 rounded-xl border border-slate-200 p-4">
           <h2 className="text-sm font-semibold text-slate-800">Bloc Points forts</h2>
+          <TextField label="Surtitre" value={form.strengthsKicker} onChange={(v) => setField("strengthsKicker", v)} />
           <div className="grid gap-4 md:grid-cols-2">
             <TextField label="Points forts - titre" value={form.strengthsTitle} onChange={(v) => setField("strengthsTitle", v)} />
             <TextField label="Badge standards" value={form.standardsBadge} onChange={(v) => setField("standardsBadge", v)} />
           </div>
+          <TextAreaField
+            label="Texte d'introduction (colonne gauche)"
+            value={form.strengthsIntro}
+            onChange={(v) => setField("strengthsIntro", v)}
+            rows={4}
+          />
           <TextAreaField
             label="Points forts (1 ligne = 1 item)"
             value={form.strengthsText}
@@ -350,7 +365,7 @@ const ABOUT_BLOCK_FIELDS: Record<AboutBlockKey, Array<keyof AboutConfig>> = {
   hero: ["kicker", "title", "intro"],
   presentation: ["cardTitle", "cardText", "cardCheck"],
   missionServices: ["missionH2", "missionP1", "missionP2", "servicesH2"],
-  strengths: ["strengthsTitle", "standardsBadge", "strengths"],
+  strengths: ["strengthsKicker", "strengthsTitle", "standardsBadge", "strengthsIntro", "strengths"],
   servicesCards: ["services"],
   teamPublic: ["expertsH2", "expertsBadge", "teamEmptyText", "teamFallbackTitle", "teamFallbackDescription"],
   experience: ["experienceKicker", "experienceYears", "experienceText"],

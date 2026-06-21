@@ -105,7 +105,7 @@ export function AdminLogin() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     autoComplete="username"
-                    placeholder="nom@gttsgroup.com"
+                    placeholder="admin@globaltransit.local"
                     required
                   />
                 </div>

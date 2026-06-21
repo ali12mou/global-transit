@@ -9,6 +9,9 @@ export type AboutConfig = {
   missionP1?: string;
   missionP2?: string;
   strengthsTitle?: string;
+  strengthsKicker?: string;
+  strengthsIntro?: string;
+  strengthsTagline?: string;
   standardsBadge?: string;
   servicesH2?: string;
   expertsH2?: string;

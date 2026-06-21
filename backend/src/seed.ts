@@ -5,6 +5,7 @@ import { Role } from "./models/Role.js";
 import { User } from "./models/User.js";
 import { Configuration } from "./models/Configuration.js";
 import { ActivityService } from "./models/ActivityService.js";
+import { ActivityOperation } from "./models/ActivityOperation.js";
 import { Project } from "./models/Project.js";
 import { Partner } from "./models/Partner.js";
 import { Client } from "./models/Client.js";
@@ -70,7 +71,12 @@ async function seed() {
         missionP2:
           "Notre objectif est d'offrir un service durable, avec un haut niveau de qualité opérationnelle et un suivi client continu.",
         strengthsTitle: "Nos points forts",
-        standardsBadge: "Standards",
+        strengthsKicker: "Découvrez comment nous accompagnons votre activité",
+        strengthsIntro:
+          "Une équipe expérimentée, des opérations sécurisées et une maîtrise complète du corridor Djibouti - Éthiopie. Conformité, rapidité d'exécution et accompagnement dédié.",
+        strengthsTagline: "— Votre fret, notre engagement.",
+        strengths: ["Communication", "Travail d'équipe", "Responsabilité"],
+        standardsBadge: "Normes",
         servicesH2: "Nos services",
         expertsH2: "Notre équipe d'experts",
         expertsBadge: "Professionnels certifiés",
@@ -112,40 +118,115 @@ async function seed() {
 
   await Team.updateMany({ order: { $exists: false } }, { $set: { order: 0 } });
 
+  const opsCount = await ActivityOperation.countDocuments();
+  if (opsCount === 0) {
+    await ActivityOperation.insertMany([
+      {
+        title: "Port Logistics",
+        slug: "port-logistics",
+        order: 1,
+        published: true,
+        imageUrl: "",
+        content: `Our port logistics services provide comprehensive solutions for the efficient handling, storage, and transportation of cargo at ports worldwide. With our expertise and state-of-the-art facilities, we ensure seamless operations and timely delivery of goods.
+
+**Container Handling:** Efficient unloading, loading, and stacking of containers, ensuring smooth cargo flow.
+**Break-Bulk Cargo Operations:** Expertise in handling non-containerized cargo, including heavy machinery and oversized items.
+**Customs Documentation and Compliance:** Assistance with customs procedures, ensuring compliance with regulations and minimizing delays.`,
+      },
+      {
+        title: "Freezone Logistics",
+        slug: "freezone-logistics",
+        order: 2,
+        published: true,
+        imageUrl: "",
+        content: `Our freezone logistics services offer specialized solutions for businesses operating within free trade zones. We provide comprehensive support to optimize supply chain operations and facilitate international trade.
+
+**Warehousing and Storage Solutions:** Secure and flexible storage facilities tailored to diverse cargo types and volumes.
+**Value-Added Services:** Labeling, packaging, assembly, and quality control to meet specific customer requirements.
+**Distribution Center Management:** Efficient order fulfillment, inventory management, and distribution to global markets.`,
+      },
+      {
+        title: "Transportation Services",
+        slug: "transportation-services",
+        order: 3,
+        published: true,
+        imageUrl: "",
+        content: `Our transportation services ensure reliable and timely delivery of goods across various modes of transport. We offer flexible solutions to meet diverse shipping needs and optimize supply chain efficiency.
+
+**Inland Transportation (Road, Rail):** Efficient movement of cargo within regions, connecting ports, warehouses, and distribution centers.
+**Multi-Modal Transport Solutions:** Seamless integration of different transport modes for cost-effective and efficient delivery.
+**Last-Mile Delivery:** Reliable delivery to final destinations, ensuring customer satisfaction and on-time fulfillment.`,
+      },
+      {
+        title: "Warehousing & Distributions",
+        slug: "warehousing-distributions",
+        order: 4,
+        published: true,
+        imageUrl: "",
+        content: `Our warehousing and distribution services provide secure storage and efficient distribution solutions to support your supply chain operations. We offer flexible options to meet varying storage and distribution requirements.
+
+**Bonded Warehouse Facilities:** Secure storage for goods under customs control, facilitating international trade and duty deferral.
+**Inventory Management:** Accurate tracking and management of inventory levels, ensuring optimal stock control and order fulfillment.
+**Order Picking and Packing:** Efficient order processing, picking, and packing services to meet customer demands and delivery schedules.`,
+      },
+    ]);
+    console.log("Opérations activités par défaut insérées.");
+  }
+
   const servicesCount = await ActivityService.countDocuments();
   if (servicesCount === 0) {
     await ActivityService.insertMany([
       {
-        title: "Clearance",
-        description: "Dédouanement et procédures administratives.",
+        title: "Port Logistics",
+        description: `Nos services portuaires couvrent la manutention, le stockage et le transit des marchandises au port de Djibouti.
+
+**Container Handling:** Déchargement, chargement et empilage efficace des conteneurs.
+**Break-Bulk Cargo Operations:** Manutention de cargaisons non conteneurisées et projets lourds.
+**Customs Documentation and Compliance:** Accompagnement douanier et conformité documentaire.`,
         imageUrl: "",
         order: 1,
         published: true,
       },
       {
-        title: "Logistics",
-        description: "Chaîne logistique et entrepôt.",
+        title: "Freezone Logistics",
+        description: `Solutions logistiques en zone franche pour optimiser vos flux import-export.
+
+**Warehousing and Storage Solutions:** Entreposage sécurisé et flexible selon vos volumes.
+**Value-Added Services:** Étiquetage, conditionnement et contrôle qualité.
+**Distribution Center Management:** Préparation de commandes et distribution régionale.`,
         imageUrl: "",
         order: 2,
         published: true,
       },
       {
-        title: "Transit",
-        description: "Transit routier et multimodal.",
+        title: "Transportation Services",
+        description: `Transport fiable sur le corridor Djibouti – Éthiopie et au-delà.
+
+**Inland Transportation (Road, Rail):** Liaison port – entrepôt – frontière.
+**Multi-Modal Transport Solutions:** Coordination route, mer et rail.
+**Last-Mile Delivery:** Livraison finale vers vos sites en Éthiopie et en région.`,
         imageUrl: "",
         order: 3,
         published: true,
       },
       {
-        title: "Système douanes",
-        description: "Conformité et systèmes douaniers.",
+        title: "Clearance",
+        description: `Dédouanement et formalités administratives pour vos opérations import-export.
+
+**Import Clearance:** Dédouanement import au port de Djibouti.
+**Export Clearance:** Formalités export et conformité documentaire.
+**Customs Compliance:** Suivi réglementaire et assistance systèmes douaniers.`,
         imageUrl: "",
         order: 4,
         published: true,
       },
       {
         title: "Documents",
-        description: "Gestion documentaire et conformité.",
+        description: `Gestion documentaire complète pour sécuriser vos opérations logistiques.
+
+**Commercial Invoices:** Vérification et suivi des factures commerciales.
+**Certificates & Permits:** Certificats d'origine, licences et autorisations.
+**Final Reporting:** Rapports de clôture et traçabilité des dossiers.`,
         imageUrl: "",
         order: 5,
         published: true,

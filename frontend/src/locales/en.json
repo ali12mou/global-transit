@@ -1,10 +1,12 @@
 {
   "nav": {
+    "home": "Home",
     "about": "About",
+    "services": "Services",
     "activities": "Our Activities",
     "projects": "Our Projects",
     "clients": "Our Clients",
-    "team": "Our Team",
+    "team": "OUR TEAM",
     "infrastructure": "OUR INFRASTRUCTURE",
     "news": "News",
     "contact": "Contact us"
@@ -138,8 +140,11 @@
     "missionH2": "Our Mission",
     "missionP1": "Facilitate market access for Ethiopian and regional importers and exporters by securing the end-to-end logistics chain.",
     "missionP2": "We align customs procedures, transit and information to reduce delays and operational risks.",
-    "strengthsTitle": "Strengths",
-    "standardsBadge": "Professional standards",
+    "strengthsTitle": "Our strengths",
+    "strengthsKicker": "See how we work to help your business",
+    "strengthsIntro": "An experienced team, secure operations and full mastery of the Djibouti - Ethiopia corridor. Compliance, fast execution and dedicated support.",
+    "strengthsTagline": "— Your cargo, our commitment.",
+    "standardsBadge": "Standards",
     "strengthCommunication": "Communication",
     "strengthTeamwork": "Teamwork",
     "strengthReporting": "Process reporting",
@@ -234,7 +239,8 @@
   "publicPages": {
     "activitiesKicker": "Expertise",
     "activitiesTitle": "Our activities & services",
-    "activitiesIntro": "Logistics, transit and customs — managed from the admin and shown here in real time.",
+    "activitiesIntro": "Logistics, transit and customs — managed from Admin → Services and shown here in real time.",
+    "activitiesEmpty": "No published services. Add entries in Admin → Services and check « Published ».",
     "projectsKicker": "Delivered work",
     "projectsTitle": "Our projects",
     "projectsIntro": "Flagship projects and strategic corridors for regional and international flows.",

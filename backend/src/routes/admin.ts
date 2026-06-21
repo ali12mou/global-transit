@@ -320,7 +320,7 @@ const ABOUT_BLOCK_FIELDS: Record<string, string[]> = {
   hero: ["kicker", "title", "intro"],
   presentation: ["cardTitle", "cardText", "cardCheck"],
   missionServices: ["missionH2", "missionP1", "missionP2", "servicesH2"],
-  strengths: ["strengthsTitle", "standardsBadge", "strengths"],
+  strengths: ["strengthsKicker", "strengthsTitle", "standardsBadge", "strengthsIntro", "strengths"],
   servicesCards: ["services"],
   teamPublic: ["expertsH2", "expertsBadge", "teamEmptyText", "teamFallbackTitle", "teamFallbackDescription"],
   experience: ["experienceKicker", "experienceYears", "experienceText"],

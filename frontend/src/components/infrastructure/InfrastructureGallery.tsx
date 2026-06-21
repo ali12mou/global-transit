@@ -15,9 +15,11 @@ const IMAGE_BOX = "relative aspect-[4/3] w-full overflow-hidden bg-slate-100";
 function InfrastructureCard({
   item,
   className = "",
+  hideName = false,
 }: {
   item: InfrastructureItem;
   className?: string;
+  hideName?: boolean;
 }) {
   const { t } = useTranslation();
 
@@ -30,7 +32,7 @@ function InfrastructureCard({
         {item.imageUrl ? (
           <img
             src={item.imageUrl}
-            alt={item.name}
+            alt={item.name?.trim() || t("home.imagePlaceholder")}
             className="h-full w-full object-cover transition duration-700 group-hover:scale-[1.05]"
             loading="lazy"
           />
@@ -41,11 +43,13 @@ function InfrastructureCard({
         )}
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[color:var(--color-gt-navy)]/50 via-transparent to-transparent opacity-0 transition group-hover:opacity-100" />
       </div>
-      <div className="flex min-h-[4.5rem] flex-1 items-center justify-center border-t border-slate-100 px-4 py-3 text-center">
-        <h3 className="line-clamp-2 font-[family-name:var(--font-display)] text-base font-semibold leading-snug text-[color:var(--color-gt-navy)]">
-          {item.name?.trim() || t("home.imagePlaceholder")}
-        </h3>
-      </div>
+      {!hideName && (
+        <div className="flex min-h-[4.5rem] flex-1 items-center justify-center border-t border-slate-100 px-4 py-3 text-center">
+          <h3 className="line-clamp-2 font-[family-name:var(--font-display)] text-base font-semibold leading-snug text-[color:var(--color-gt-navy)]">
+            {item.name?.trim() || t("home.imagePlaceholder")}
+          </h3>
+        </div>
+      )}
     </article>
   );
 }
@@ -140,7 +144,9 @@ export function InfrastructureGallery(props: Props) {
             <MarqueeTrack
               items={sorted}
               durationSec={32}
-              renderCard={(item) => <InfrastructureCard item={item} className="h-full" />}
+              renderCard={(item) => (
+                <InfrastructureCard item={item} className="h-full" hideName />
+              )}
             />
           )}
         </div>
