@@ -5,6 +5,7 @@ import { BrowserRouter } from "react-router-dom";
 import "./index.css";
 import "./i18n/config";
 import { App } from "./App";
+import { dismissSplash } from "./lib/splash";
 
 const queryClient = new QueryClient();
 
@@ -17,3 +18,5 @@ createRoot(document.getElementById("root")!).render(
     </QueryClientProvider>
   </StrictMode>
 );
+
+dismissSplash();

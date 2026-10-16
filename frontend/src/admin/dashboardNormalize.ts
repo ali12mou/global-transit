@@ -1,3 +1,20 @@
+export type VisitStats = {
+  pageViewsToday: number;
+  visitorsToday: number;
+  pageViews30d: number;
+  pageViewsPrev30d: number;
+  sessions30d: number;
+  sessionsPrev30d: number;
+  visitors30d: number;
+  visitorsPrev30d: number;
+  pageViewsTotal: number;
+  referredSessions30d: number;
+  visitsByDay: { day: string; pageViews: number; visitors: number }[];
+  topPages: { path: string; views: number }[];
+  devices: { device: string; count: number }[];
+  referrers: { source: string; count: number }[];
+};
+
 export type DashboardData = {
   contactsNew: number;
   contactsTotal: number;
@@ -18,6 +35,8 @@ export type DashboardData = {
   operationsTotal: number;
   usersCount: number;
   rolesCount: number;
+  infrastructuresCount: number;
+  visits: VisitStats;
   contactsByMonth: { monthKey: string; count: number }[];
   newsByMonth: { monthKey: string; count: number }[];
   lastLogins: { email: string; lastLogin: string | null }[];
@@ -28,6 +47,23 @@ export type DashboardData = {
     subtitle?: string;
     at: string;
   }[];
+};
+
+const EMPTY_VISITS: VisitStats = {
+  pageViewsToday: 0,
+  visitorsToday: 0,
+  pageViews30d: 0,
+  pageViewsPrev30d: 0,
+  sessions30d: 0,
+  sessionsPrev30d: 0,
+  visitors30d: 0,
+  visitorsPrev30d: 0,
+  pageViewsTotal: 0,
+  referredSessions30d: 0,
+  visitsByDay: [],
+  topPages: [],
+  devices: [],
+  referrers: [],
 };
 
 const EMPTY: DashboardData = {
@@ -50,6 +86,8 @@ const EMPTY: DashboardData = {
   operationsTotal: 0,
   usersCount: 0,
   rolesCount: 0,
+  infrastructuresCount: 0,
+  visits: EMPTY_VISITS,
   contactsByMonth: [],
   newsByMonth: [],
   lastLogins: [],
@@ -81,6 +119,36 @@ function isLogin(x: unknown): x is { email: string; lastLogin: string | null } {
   if (!x || typeof x !== "object") return false;
   const o = x as Record<string, unknown>;
   return typeof o.email === "string" && (o.lastLogin === null || typeof o.lastLogin === "string");
+}
+
+function isRecord(x: unknown): x is Record<string, unknown> {
+  return !!x && typeof x === "object" && !Array.isArray(x);
+}
+
+function normalizeVisits(raw: unknown): VisitStats {
+  if (!isRecord(raw)) return { ...EMPTY_VISITS };
+  const num = (k: string) => (typeof raw[k] === "number" && Number.isFinite(raw[k]) ? (raw[k] as number) : 0);
+  const rows = (k: string) => (Array.isArray(raw[k]) ? (raw[k] as unknown[]).filter(isRecord) : []);
+  return {
+    pageViewsToday: num("pageViewsToday"),
+    visitorsToday: num("visitorsToday"),
+    pageViews30d: num("pageViews30d"),
+    pageViewsPrev30d: num("pageViewsPrev30d"),
+    sessions30d: num("sessions30d"),
+    sessionsPrev30d: num("sessionsPrev30d"),
+    visitors30d: num("visitors30d"),
+    visitorsPrev30d: num("visitorsPrev30d"),
+    pageViewsTotal: num("pageViewsTotal"),
+    referredSessions30d: num("referredSessions30d"),
+    visitsByDay: rows("visitsByDay").map((r) => ({
+      day: String(r.day ?? ""),
+      pageViews: Number(r.pageViews) || 0,
+      visitors: Number(r.visitors) || 0,
+    })),
+    topPages: rows("topPages").map((r) => ({ path: String(r.path ?? ""), views: Number(r.views) || 0 })),
+    devices: rows("devices").map((r) => ({ device: String(r.device ?? ""), count: Number(r.count) || 0 })),
+    referrers: rows("referrers").map((r) => ({ source: String(r.source ?? ""), count: Number(r.count) || 0 })),
+  };
 }
 
 function filterArray<T>(raw: unknown, guard: (x: unknown) => x is T): T[] {
@@ -115,6 +183,8 @@ export function normalizeDashboard(raw: unknown): DashboardData {
     operationsTotal: num("operationsTotal"),
     usersCount: num("usersCount"),
     rolesCount: num("rolesCount"),
+    infrastructuresCount: num("infrastructuresCount"),
+    visits: normalizeVisits(r.visits),
     contactsByMonth: filterArray(r.contactsByMonth, isMonthRow),
     newsByMonth: filterArray(r.newsByMonth, isMonthRow),
     lastLogins: filterArray(r.lastLogins, isLogin),

@@ -50,7 +50,7 @@ export function InfrastructurePage() {
               <p className="text-xs uppercase tracking-wider text-slate-300">Assets</p>
             </div>
             <div className="rounded-2xl border border-white/15 bg-white/5 p-4 backdrop-blur-sm">
-              <FaTruck className="text-2xl text-[color:var(--color-gt-coral)]" />
+              <FaTruck className="text-2xl text-[color:var(--color-gt-gold)]" />
               <p className="mt-3 text-3xl font-bold">24/7</p>
               <p className="text-xs uppercase tracking-wider text-slate-300">Service</p>
             </div>

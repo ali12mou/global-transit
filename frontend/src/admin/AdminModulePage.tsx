@@ -1,22 +1,38 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { FaEnvelope, FaGlobe, FaWhatsapp } from "react-icons/fa";
-import { IoPencil, IoTrashOutline } from "react-icons/io5";
+import {
+  IoAdd,
+  IoAlertCircleOutline,
+  IoCheckmark,
+  IoClose,
+  IoCloudUploadOutline,
+  IoImageOutline,
+  IoInformationCircleOutline,
+  IoPencil,
+  IoTrashOutline,
+} from "react-icons/io5";
 import { apiFetch, apiUploadImage } from "@/api/client";
 import { buildWhatsAppUrl, digitsFromPhoneDisplay, normalizeWebsiteHref } from "@/lib/contactReply";
 import { slugify } from "@/lib/slugify";
 import type { EntityModule, FieldDef } from "./entityModules";
 import type { UploadCategory } from "@/uploadCategory";
+import { useAdminFeedback } from "./ui/AdminFeedback";
 
 const PARTNER_TYPE_LABELS = ["Ports", "FREE ZONE", "AGENCE"] as const;
 
 type Row = Record<string, unknown> & { _id: string };
+
+function rowName(row: Record<string, unknown> | null | undefined) {
+  return String(row?.title ?? row?.name ?? "").trim();
+}
 
 export function AdminModulePage({ module }: { module: EntityModule }) {
   const qc = useQueryClient();
   const [editing, setEditing] = useState<Row | null>(null);
   const [creating, setCreating] = useState(false);
   const [teamFormMode, setTeamFormMode] = useState<"compact" | "standard">("standard");
+  const feedback = useAdminFeedback();
 
   const { data = [], isLoading, error } = useQuery({
     queryKey: ["admin", module.api],
@@ -36,8 +52,9 @@ export function AdminModulePage({ module }: { module: EntityModule }) {
         body: JSON.stringify(payload.body),
       });
     },
-    onSuccess: () => {
+    onSuccess: (saved, payload) => {
       qc.invalidateQueries({ queryKey: ["admin", module.api] });
+      qc.invalidateQueries({ queryKey: ["admin-dashboard"] });
       if (module.route === "news") {
         qc.invalidateQueries({ queryKey: ["news-page"] });
         qc.invalidateQueries({ queryKey: ["news"] });
@@ -49,6 +66,8 @@ export function AdminModulePage({ module }: { module: EntityModule }) {
         qc.invalidateQueries({ queryKey: ["activity-services-page"] });
         qc.invalidateQueries({ queryKey: ["activity-services"] });
       }
+      const name = rowName(saved) || rowName(payload.body);
+      feedback.success(payload.id ? "Modifications enregistrées" : "Élément ajouté", name ? `« ${name} » — ${module.title}` : module.title);
       setEditing(null);
       setCreating(false);
     },
@@ -56,8 +75,12 @@ export function AdminModulePage({ module }: { module: EntityModule }) {
 
   const delMut = useMutation({
     mutationFn: (id: string) => apiFetch<undefined>(`${module.api}/${id}`, { method: "DELETE" }),
-    onSuccess: () => {
+    onError: (e) => feedback.error("Suppression impossible", (e as Error).message),
+    onSuccess: (_r, id) => {
+      const name = rowName(data.find((row) => row._id === id));
+      feedback.success("Élément supprimé", name ? `« ${name} » a été retiré de « ${module.title} ».` : undefined);
       qc.invalidateQueries({ queryKey: ["admin", module.api] });
+      qc.invalidateQueries({ queryKey: ["admin-dashboard"] });
       if (module.route === "news") {
         qc.invalidateQueries({ queryKey: ["news-page"] });
         qc.invalidateQueries({ queryKey: ["news"] });
@@ -72,10 +95,18 @@ export function AdminModulePage({ module }: { module: EntityModule }) {
     },
   });
 
-  const columns = useMemo(() => {
-    const keys = module.fields.slice(0, 4).map((f) => f.key);
-    return keys;
-  }, [module.fields]);
+  const columns = useMemo(() => module.fields.slice(0, 4), [module.fields]);
+
+  async function askDelete(id: string, question: string) {
+    const name = rowName(data.find((row) => row._id === id));
+    const ok = await feedback.confirm({
+      title: question,
+      message: `${name ? `« ${name} » sera` : "L'élément sera"} définitivement supprimé. Cette action est irréversible.`,
+      confirmLabel: "Supprimer",
+      danger: true,
+    });
+    if (ok) delMut.mutate(id);
+  }
 
   const isServices = module.route === "activity-services";
   const isPartners = module.route === "partners";
@@ -96,31 +127,40 @@ export function AdminModulePage({ module }: { module: EntityModule }) {
       ? module.teamCompactFields ?? module.fields
       : module.teamStandardFields ?? module.fields;
 
-  if (isLoading) return <p className="text-slate-600">Chargement…</p>;
-  if (error) return <p className="text-red-700">{(error as Error).message}</p>;
+  if (isLoading) {
+    return (
+      <div className="space-y-4" aria-busy="true">
+        <div className="h-14 w-1/2 animate-pulse rounded-2xl bg-slate-200/70" />
+        <div className="h-72 animate-pulse rounded-2xl bg-slate-200/70" />
+        <p className="sr-only">Chargement…</p>
+      </div>
+    );
+  }
+  if (error) {
+    return (
+      <div role="alert" className="flex gap-3 rounded-2xl border border-red-200 bg-red-50 px-5 py-4 text-sm text-red-800">
+        <IoAlertCircleOutline className="mt-0.5 h-5 w-5 shrink-0" aria-hidden />
+        <span>
+          <span className="block font-semibold">Impossible de charger « {module.title} »</span>
+          {(error as Error).message}
+        </span>
+      </div>
+    );
+  }
 
   return (
     <div>
-      <div className="flex flex-wrap items-center justify-between gap-4">
+      <div className="flex flex-wrap items-end justify-between gap-4 border-b border-slate-200/80 pb-6">
         <div>
-          <h1 className="font-[family-name:var(--font-display)] text-2xl text-[color:var(--color-gt-navy)]">
-            {module.title}
-          </h1>
-          {isNews && (
-            <p className="mt-1 max-w-2xl text-sm text-slate-600">
-              Les entrées <strong className="text-slate-800">publiées</strong> sont listées sur la page publique{" "}
-              <code className="rounded bg-slate-100 px-1.5 py-0.5 text-xs text-slate-800">/actualites</code> (API{" "}
-              <code className="rounded bg-slate-100 px-1.5 py-0.5 text-xs">GET /api/news</code>).
-            </p>
-          )}
-          {isServices && (
-            <p className="mt-1 max-w-2xl text-sm text-slate-600">
-              Les services <strong className="text-slate-800">publiés</strong> s&apos;affichent sur{" "}
-              <code className="rounded bg-slate-100 px-1.5 py-0.5 text-xs text-slate-800">/activites</code> (menu
-              Services → Our Activities). Format description : paragraphe d&apos;intro, puis lignes{" "}
-              <code className="rounded bg-slate-100 px-1">**Titre:** texte</code>.
-            </p>
-          )}
+          <div className="flex items-center gap-3">
+            <h1 className="font-[family-name:var(--font-display)] text-[1.75rem] font-bold text-[color:var(--color-gt-navy)]">
+              {module.title}
+            </h1>
+            <span className="rounded-full bg-[#eef3fc] px-2.5 py-0.5 text-xs font-bold tabular-nums text-[color:var(--color-gt-brand-blue)]">
+              {data.length}
+            </span>
+          </div>
+          {module.description && <p className="mt-1.5 max-w-3xl text-sm leading-relaxed text-slate-600">{module.description}</p>}
           {isTeam && (
             <p className="mt-1 max-w-3xl text-sm text-slate-600">
               Gérez l&apos;organigramme direction (cartes sur{" "}
@@ -136,8 +176,9 @@ export function AdminModulePage({ module }: { module: EntityModule }) {
               setCreating(true);
               setEditing(null);
             }}
-            className="rounded-lg bg-[color:var(--color-gt-blue)] px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:opacity-95"
+            className="gt-brand-blue-bg inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-white shadow-md shadow-blue-900/15 transition hover:brightness-110"
           >
+            <IoAdd className="h-5 w-5" aria-hidden />
             Ajouter
           </button>
         ) : null}
@@ -151,7 +192,7 @@ export function AdminModulePage({ module }: { module: EntityModule }) {
             setCreating(false);
           }}
           onDelete={(id) => {
-            if (confirm("Supprimer ce service ?")) delMut.mutate(id);
+            void askDelete(id, "Supprimer ce service ?");
           }}
         />
       ) : isPartners ? (
@@ -162,7 +203,7 @@ export function AdminModulePage({ module }: { module: EntityModule }) {
             setCreating(false);
           }}
           onDelete={(id) => {
-            if (confirm("Supprimer ce partenaire ?")) delMut.mutate(id);
+            void askDelete(id, "Supprimer ce partenaire ?");
           }}
         />
       ) : isNews ? (
@@ -173,7 +214,7 @@ export function AdminModulePage({ module }: { module: EntityModule }) {
             setCreating(false);
           }}
           onDelete={(id) => {
-            if (confirm("Supprimer cette actualité ?")) delMut.mutate(id);
+            void askDelete(id, "Supprimer cette actualité ?");
           }}
         />
       ) : isInfrastructure ? (
@@ -184,7 +225,7 @@ export function AdminModulePage({ module }: { module: EntityModule }) {
             setCreating(false);
           }}
           onDelete={(id) => {
-            if (confirm("Supprimer cette infrastructure ?")) delMut.mutate(id);
+            void askDelete(id, "Supprimer cette infrastructure ?");
           }}
         />
       ) : isTeam ? (
@@ -220,7 +261,7 @@ export function AdminModulePage({ module }: { module: EntityModule }) {
                 setCreating(false);
               }}
               onDelete={(id) => {
-                if (confirm("Supprimer ce contact direction ?")) delMut.mutate(id);
+                void askDelete(id, "Supprimer ce contact direction ?");
               }}
             />
           </section>
@@ -255,7 +296,7 @@ export function AdminModulePage({ module }: { module: EntityModule }) {
                 setCreating(false);
               }}
               onDelete={(id) => {
-                if (confirm("Supprimer ce membre ?")) delMut.mutate(id);
+                void askDelete(id, "Supprimer ce membre ?");
               }}
             />
           </section>
@@ -266,41 +307,49 @@ export function AdminModulePage({ module }: { module: EntityModule }) {
             <thead className="bg-slate-50 text-slate-600">
               <tr>
                 {columns.map((c) => (
-                  <th key={c} className="px-4 py-3 font-medium capitalize">
-                    {c}
+                  <th key={c.key} className="px-4 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-500">
+                    {c.label}
                   </th>
                 ))}
-                <th className="px-4 py-3 font-medium">Actions</th>
+                <th className="px-4 py-3.5 text-right text-xs font-semibold uppercase tracking-wider text-slate-500">Actions</th>
               </tr>
             </thead>
             <tbody>
               {data.map((row) => (
                 <tr key={row._id} className="border-t border-slate-100">
                   {columns.map((c) => (
-                    <td key={c} className="max-w-[220px] truncate px-4 py-2">
-                      {formatCell(row[c])}
+                    <td key={c.key} className="max-w-[260px] truncate px-4 py-3 align-middle">
+                      {c.type === "file-image" && row[c.key] ? (
+                        <img src={String(row[c.key])} alt="" className="h-10 max-w-[96px] rounded object-contain" loading="lazy" />
+                      ) : (
+                        formatCell(row[c.key])
+                      )}
                     </td>
                   ))}
-                  <td className="space-x-2 px-4 py-2 whitespace-nowrap">
-                    <button
-                      type="button"
-                      className="text-[color:var(--color-gt-blue)] underline"
-                      onClick={() => {
-                        setEditing(row);
-                        setCreating(false);
-                      }}
-                    >
-                      Modifier
-                    </button>
-                    <button
-                      type="button"
-                      className="text-red-700 underline"
-                      onClick={() => {
-                        if (confirm("Supprimer cet élément ?")) delMut.mutate(row._id);
-                      }}
-                    >
-                      Supprimer
-                    </button>
+                  <td className="px-4 py-3 align-middle">
+                    <div className="flex justify-end gap-2">
+                      <button
+                        type="button"
+                        className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-[color:var(--color-gt-blue)] hover:bg-slate-50"
+                        onClick={() => {
+                          setEditing(row);
+                          setCreating(false);
+                        }}
+                      >
+                        <IoPencil className="h-4 w-4" aria-hidden />
+                        Modifier
+                      </button>
+                      <button
+                        type="button"
+                        className="inline-flex items-center gap-1 rounded-lg border border-red-100 bg-red-50/80 px-3 py-1.5 text-xs font-semibold text-red-700 hover:bg-red-100"
+                        onClick={() => {
+                          void askDelete(row._id, "Supprimer cet élément ?");
+                        }}
+                      >
+                        <IoTrashOutline className="h-4 w-4" aria-hidden />
+                        Supprimer
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -329,6 +378,7 @@ export function AdminModulePage({ module }: { module: EntityModule }) {
           onClose={() => {
             setCreating(false);
             setEditing(null);
+            saveMut.reset();
           }}
           onSave={(body) => {
             if (module.route === "roles") {
@@ -903,7 +953,7 @@ function NewsTable({
   return (
     <div className="mt-6 overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-[0_1px_3px_rgba(15,23,42,0.08)]">
       <div className="overflow-x-auto">
-        <table className="min-w-[920px] w-full border-collapse text-left text-sm">
+        <table className="min-w-[1060px] w-full border-collapse text-left text-sm">
           <thead>
             <tr className="border-b border-slate-200 bg-gradient-to-b from-slate-50 to-slate-100/90">
               <th className="px-4 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-500">Image</th>
@@ -913,6 +963,8 @@ function NewsTable({
                 Site public
               </th>
               <th className="px-4 py-3.5 text-xs font-semibold uppercase tracking-wider text-slate-500">Publié le</th>
+              <th className="px-4 py-3.5 text-center text-xs font-semibold uppercase tracking-wider text-slate-500">Vues</th>
+              <th className="px-4 py-3.5 text-center text-xs font-semibold uppercase tracking-wider text-slate-500">J&apos;aime</th>
               <th className="w-36 px-4 py-3.5 text-center text-xs font-semibold uppercase tracking-wider text-slate-500">
                 Aperçu
               </th>
@@ -957,6 +1009,8 @@ function NewsTable({
                     </span>
                   </td>
                   <td className="whitespace-nowrap px-4 py-3 align-middle text-slate-600">{formatNewsDate(row.publishedAt)}</td>
+                  <td className="px-4 py-3 text-center align-middle font-semibold tabular-nums text-slate-700">{Number(row.views ?? 0)}</td>
+                  <td className="px-4 py-3 text-center align-middle font-semibold tabular-nums text-[color:var(--color-gt-brand-blue)]">{Number(row.likes ?? 0)}</td>
                   <td className="px-4 py-3 text-center align-middle">
                     {published && publicUrl ? (
                       <a
@@ -1053,6 +1107,14 @@ function parseRoleBody(body: Record<string, unknown>) {
   return { name, permissions };
 }
 
+/** Champs courts affichés sur une demi-largeur (deux par ligne sur écran large). */
+const HALF_WIDTH_KEYS = new Set(["phone", "email", "website", "url", "fax", "type", "order", "layout", "publishedAt"]);
+
+function isHalfWidth(f: FieldDef) {
+  if (f.type === "number" || f.type === "select" || f.type === "datetime-local") return true;
+  return f.type === "text" && HALF_WIDTH_KEYS.has(f.key);
+}
+
 function EntityForm({
   module,
   fields,
@@ -1075,6 +1137,8 @@ function EntityForm({
   error: Error | null;
 }) {
   const formFields = fields ?? module.fields;
+  const [invalid, setInvalid] = useState<string[]>([]);
+  const formId = `entity-form-${module.route}`;
 
   const defaults = useMemo(() => {
     const o: Record<string, unknown> = {};
@@ -1106,9 +1170,23 @@ function EntityForm({
     return merged;
   }, [initial, formFields, module.route, hiddenValues?.layout]);
 
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && !loading) onClose();
+    };
+    window.addEventListener("keydown", onKey);
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.body.style.overflow = prevOverflow;
+    };
+  }, [loading, onClose]);
+
   function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    const fd = new FormData(e.currentTarget);
+    const form = e.currentTarget;
+    const fd = new FormData(form);
     const body: Record<string, unknown> = {};
     for (const f of formFields) {
       if (f.type === "checkbox") {
@@ -1117,80 +1195,189 @@ function EntityForm({
         body[f.key] = fd.get(f.key) ?? "";
       }
     }
+    const missing = formFields.filter((f) => f.required && !String(body[f.key] ?? "").trim()).map((f) => f.key);
+    setInvalid(missing);
+    if (missing.length > 0) {
+      form.querySelector<HTMLElement>(`[name="${missing[0]}"]`)?.focus();
+      return;
+    }
     onSave(body);
   }
 
+  const itemName = initial ? String(initial.title ?? initial.name ?? "").trim() : "";
+  const heading = formTitle ?? (initial ? "Modifier l'élément" : "Ajouter un élément");
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-[2px]">
+    <div
+      className="fixed inset-0 z-50 flex justify-end bg-[#010f3a]/50 backdrop-blur-[2px]"
+      onMouseDown={(e) => {
+        if (e.target === e.currentTarget && !loading) onClose();
+      }}
+    >
       <div
-        className={`max-h-[90vh] w-full overflow-y-auto rounded-2xl border border-slate-200/80 bg-white p-6 shadow-2xl shadow-slate-900/10 ${module.route === "news" ? "max-w-2xl" : "max-w-lg"}`}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={`${formId}-title`}
+        className="gt-drawer-in flex h-full w-full max-w-2xl flex-col bg-white shadow-[-24px_0_60px_-20px_rgba(1,15,58,0.45)]"
       >
-        <h2 className="text-lg font-semibold text-[color:var(--color-gt-navy)]">
-          {formTitle ?? (initial ? "Modifier" : "Créer")}
-        </h2>
-        {module.route === "news" && (
-          <p className="mt-2 text-xs leading-relaxed text-slate-600">
-            Décochez « Visible sur le site » pour garder un brouillon. Le slug alimente l’URL{" "}
-            <code className="rounded bg-slate-100 px-1">/actualites/votre-slug</code>.
+        <header className="flex items-start justify-between gap-4 border-b border-slate-200 px-6 py-5">
+          <div className="min-w-0">
+            <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-[color:var(--color-gt-gold)]">{module.title}</p>
+            <h2 id={`${formId}-title`} className="mt-1 text-xl font-semibold text-[color:var(--color-gt-navy)]">
+              {heading}
+            </h2>
+            {itemName ? <p className="mt-0.5 truncate text-sm text-slate-500">« {itemName} »</p> : null}
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            disabled={loading}
+            className="rounded-lg p-2 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700 disabled:opacity-50"
+            aria-label="Fermer le formulaire"
+          >
+            <IoClose className="h-6 w-6" />
+          </button>
+        </header>
+
+        <div className="flex-1 overflow-y-auto px-6 py-6">
+          {module.route === "news" && (
+            <p className="mb-6 flex gap-3 rounded-xl border border-blue-100 bg-blue-50/70 px-4 py-3 text-sm leading-relaxed text-slate-700">
+              <IoInformationCircleOutline className="mt-0.5 h-5 w-5 shrink-0 text-[color:var(--color-gt-brand-blue)]" aria-hidden />
+              <span>
+                Décochez « Visible sur le site » pour garder un brouillon. Le slug alimente l&apos;adresse{" "}
+                <code className="rounded bg-white px-1 text-xs">/actualites/votre-slug</code>.
+              </span>
+            </p>
+          )}
+          {error && (
+            <p role="alert" className="mb-6 flex gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
+              <IoAlertCircleOutline className="mt-0.5 h-5 w-5 shrink-0" aria-hidden />
+              <span>
+                <span className="block font-semibold">L&apos;enregistrement a échoué</span>
+                {error.message}
+              </span>
+            </p>
+          )}
+          {invalid.length > 0 && (
+            <p role="alert" className="mb-6 flex gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+              <IoAlertCircleOutline className="mt-0.5 h-5 w-5 shrink-0" aria-hidden />
+              Merci de compléter les champs obligatoires signalés en rouge.
+            </p>
+          )}
+          <form id={formId} onSubmit={onSubmit} noValidate className="grid gap-5 sm:grid-cols-2">
+            {hiddenValues
+              ? Object.entries(hiddenValues).map(([key, value]) => <input key={key} type="hidden" name={key} value={value} />)
+              : null}
+            {formFields.map((f) => (
+              <div key={f.key} className={isHalfWidth(f) ? "" : "sm:col-span-2"}>
+                <FieldControl field={f} defaults={defaults} invalid={invalid.includes(f.key)} formId={formId} />
+              </div>
+            ))}
+          </form>
+        </div>
+
+        <footer className="flex flex-col-reverse gap-3 border-t border-slate-200 bg-slate-50/80 px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-xs text-slate-500">
+            <span className="text-red-600">*</span> Champ obligatoire · <kbd className="rounded border border-slate-300 bg-white px-1">Échap</kbd> pour fermer
           </p>
-        )}
-        {error && <p className="mt-2 text-sm text-red-700">{error.message}</p>}
-        <form onSubmit={onSubmit} className="mt-4 space-y-4">
-          {hiddenValues
-            ? Object.entries(hiddenValues).map(([key, value]) => (
-                <input key={key} type="hidden" name={key} value={value} />
-              ))
-            : null}
-          {formFields.map((f) => (
-            <FieldControl key={f.key} field={f} defaults={defaults} />
-          ))}
-          <div className="flex flex-wrap gap-2 pt-2">
-            <button
-              type="submit"
-              disabled={loading}
-              className="rounded-lg bg-[color:var(--color-gt-blue)] px-5 py-2.5 text-sm font-semibold text-white shadow-sm disabled:opacity-60"
-            >
-              {loading ? "Enregistrement…" : "Enregistrer"}
-            </button>
+          <div className="flex gap-2">
             <button
               type="button"
               onClick={onClose}
-              className="rounded-lg border border-slate-300 bg-white px-5 py-2.5 text-sm font-medium text-slate-800 hover:bg-slate-50"
+              disabled={loading}
+              className="flex-1 rounded-xl border border-slate-300 bg-white px-5 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-100 disabled:opacity-50 sm:flex-none"
             >
               Annuler
             </button>
+            <button
+              type="submit"
+              form={formId}
+              disabled={loading}
+              className="gt-brand-blue-bg inline-flex flex-1 items-center justify-center gap-2 rounded-xl px-6 py-2.5 text-sm font-semibold text-white shadow-md shadow-blue-900/20 transition hover:brightness-110 disabled:opacity-70 sm:flex-none"
+            >
+              {loading ? (
+                <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" aria-hidden />
+              ) : (
+                <IoCheckmark className="h-4 w-4" aria-hidden />
+              )}
+              {loading ? "Enregistrement…" : initial ? "Enregistrer les modifications" : "Ajouter"}
+            </button>
           </div>
-        </form>
+        </footer>
       </div>
     </div>
   );
 }
 
-function FieldControl({ field, defaults }: { field: FieldDef; defaults: Record<string, unknown> }) {
+const inputBase =
+  "mt-1.5 w-full rounded-xl border bg-white px-3.5 py-2.5 text-sm text-slate-900 shadow-sm outline-none transition placeholder:text-slate-400 focus:ring-4";
+
+function inputClass(invalid: boolean) {
+  return `${inputBase} ${
+    invalid
+      ? "border-red-400 focus:border-red-500 focus:ring-red-100"
+      : "border-slate-300 focus:border-[color:var(--color-gt-brand-blue-light)] focus:ring-[color:var(--color-gt-brand-blue-light)]/12"
+  }`;
+}
+
+function FieldLabel({ field, htmlFor }: { field: FieldDef; htmlFor: string }) {
+  return (
+    <label htmlFor={htmlFor} className="text-sm font-semibold text-slate-700">
+      {field.label}
+      {field.required ? <span className="ml-0.5 text-red-600">*</span> : null}
+    </label>
+  );
+}
+
+function FieldHelp({ field, invalid, id }: { field: FieldDef; invalid: boolean; id: string }) {
+  if (invalid) {
+    return (
+      <p id={id} className="mt-1.5 text-xs font-medium text-red-600">
+        Ce champ est obligatoire.
+      </p>
+    );
+  }
+  return field.hint ? (
+    <p id={id} className="mt-1.5 text-xs leading-relaxed text-slate-500">
+      {field.hint}
+    </p>
+  ) : null;
+}
+
+function FieldControl({
+  field,
+  defaults,
+  invalid,
+  formId,
+}: {
+  field: FieldDef;
+  defaults: Record<string, unknown>;
+  invalid: boolean;
+  formId: string;
+}) {
   const dv = defaults[field.key] != null ? String(defaults[field.key]) : "";
+  const id = `${formId}-${field.key}`;
+  const helpId = `${id}-help`;
+  const describedBy = invalid || field.hint ? helpId : undefined;
 
   if (field.type === "file-image") {
     const cat = field.uploadCategory;
     if (!cat) {
-      return (
-        <p className="text-sm text-red-600">
-          Champ « {field.label} » : définir uploadCategory dans entityModules.
-        </p>
-      );
+      return <p className="text-sm text-red-600">Champ « {field.label} » : définir uploadCategory dans entityModules.</p>;
     }
-    return <ImageUploadField name={field.key} label={field.label} defaultValue={dv} category={cat} />;
+    return <ImageUploadField name={field.key} label={field.label} defaultValue={dv} category={cat} hint={field.hint} />;
   }
 
   if (field.type === "select") {
     const opts = field.options ?? [];
     return (
       <div>
-        <label className="text-sm font-medium text-slate-700">{field.label}</label>
+        <FieldLabel field={field} htmlFor={id} />
         <select
+          id={id}
           name={field.key}
-          aria-label={field.label}
-          required
-          className="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm shadow-inner focus:border-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-100"
+          aria-describedby={describedBy}
+          className={inputClass(invalid)}
           defaultValue={dv || opts[0] || ""}
         >
           {opts.map((opt) => (
@@ -1199,108 +1386,197 @@ function FieldControl({ field, defaults }: { field: FieldDef; defaults: Record<s
             </option>
           ))}
         </select>
+        <FieldHelp field={field} invalid={invalid} id={helpId} />
       </div>
     );
   }
 
   if (field.type === "checkbox") {
     return (
-      <div className="pt-1">
-        <label className="inline-flex cursor-pointer items-center gap-2.5 text-sm font-medium text-slate-800">
-          <input
-            name={field.key}
-            type="checkbox"
-            aria-label={field.label}
-            className="size-4 rounded border-slate-300 text-teal-600 focus:ring-[color:var(--color-gt-blue)]"
-            defaultChecked={Boolean(defaults[field.key])}
-          />
-          {field.label}
-        </label>
-      </div>
+      <label
+        htmlFor={id}
+        className="flex cursor-pointer items-center justify-between gap-4 rounded-xl border border-slate-200 bg-slate-50/60 px-4 py-3.5 transition hover:border-slate-300"
+      >
+        <span>
+          <span className="block text-sm font-semibold text-slate-800">{field.label}</span>
+          {field.hint ? <span className="mt-0.5 block text-xs text-slate-500">{field.hint}</span> : null}
+        </span>
+        <span className="relative inline-flex shrink-0">
+          <input id={id} name={field.key} type="checkbox" className="peer sr-only" defaultChecked={Boolean(defaults[field.key])} />
+          <span className="h-6 w-11 rounded-full bg-slate-300 transition peer-checked:bg-[color:var(--color-gt-brand-blue-light)] peer-focus-visible:ring-4 peer-focus-visible:ring-[color:var(--color-gt-brand-blue-light)]/20" />
+          <span className="pointer-events-none absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white shadow transition peer-checked:translate-x-5" />
+        </span>
+      </label>
     );
   }
 
   return (
     <div>
-      <label className="text-sm font-medium text-slate-700">{field.label}</label>
+      <FieldLabel field={field} htmlFor={id} />
       {field.type === "textarea" ? (
         <textarea
+          id={id}
           name={field.key}
-          aria-label={field.label}
-          className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm shadow-inner"
-          rows={4}
+          aria-describedby={describedBy}
+          aria-invalid={invalid || undefined}
+          className={`${inputClass(invalid)} min-h-[110px] resize-y leading-relaxed`}
+          rows={field.key === "body" || field.key === "description" ? 7 : 4}
+          placeholder={field.placeholder}
           defaultValue={dv}
         />
       ) : (
         <input
+          id={id}
           name={field.key}
-          aria-label={field.label}
+          aria-describedby={describedBy}
+          aria-invalid={invalid || undefined}
           type={field.type === "number" ? "number" : field.type === "datetime-local" ? "datetime-local" : "text"}
-          className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm shadow-inner"
+          className={inputClass(invalid)}
+          placeholder={field.placeholder}
           defaultValue={dv || undefined}
         />
       )}
+      <FieldHelp field={field} invalid={invalid} id={helpId} />
     </div>
   );
 }
+
+const MAX_UPLOAD_BYTES = 5 * 1024 * 1024;
 
 function ImageUploadField({
   name,
   label,
   defaultValue,
   category,
+  hint,
 }: {
   name: string;
   label: string;
   defaultValue: string;
   category: UploadCategory;
+  hint?: string;
 }) {
   const [storedUrl, setStoredUrl] = useState(defaultValue);
   const [uploading, setUploading] = useState(false);
+  const [dragOver, setDragOver] = useState(false);
   const [upErr, setUpErr] = useState<string | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     setStoredUrl(defaultValue);
     setUpErr(null);
   }, [defaultValue]);
 
+  async function upload(file: File | undefined) {
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      setUpErr("Ce fichier n'est pas une image (JPEG, PNG, GIF, WebP ou SVG).");
+      return;
+    }
+    if (file.size > MAX_UPLOAD_BYTES) {
+      setUpErr("Image trop lourde : 5 Mo maximum.");
+      return;
+    }
+    setUpErr(null);
+    setUploading(true);
+    try {
+      const r = await apiUploadImage(file, category);
+      setStoredUrl(r.url);
+    } catch (ex) {
+      setUpErr((ex as Error).message);
+    } finally {
+      setUploading(false);
+    }
+  }
+
   return (
     <div>
-      <label className="text-sm font-medium text-slate-700">{label}</label>
-      <p className="mt-0.5 text-xs text-slate-500">
-        Importez une image depuis votre ordinateur (JPEG, PNG, GIF, WebP, SVG — max 5&nbsp;Mo). Elle sera stockée sur le
-        serveur.
-      </p>
+      <span className="text-sm font-semibold text-slate-700">{label}</span>
       <input type="hidden" name={name} value={storedUrl} readOnly />
       <input
+        ref={inputRef}
         type="file"
         accept="image/*"
+        className="sr-only"
+        tabIndex={-1}
         aria-label={`Importer une image — ${label}`}
-        className="mt-2 block w-full cursor-pointer text-sm text-slate-600 file:mr-4 file:rounded-lg file:border-0 file:bg-[color:var(--color-gt-blue)] file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:opacity-95"
         disabled={uploading}
-        onChange={async (e) => {
+        onChange={(e) => {
           const file = e.target.files?.[0];
           e.target.value = "";
-          if (!file) return;
-          setUpErr(null);
-          setUploading(true);
-          try {
-            const r = await apiUploadImage(file, category);
-            setStoredUrl(r.url);
-          } catch (ex) {
-            setUpErr((ex as Error).message);
-          } finally {
-            setUploading(false);
-          }
+          void upload(file);
         }}
       />
-      {uploading && <p className="mt-2 text-xs text-slate-500">Téléversement en cours…</p>}
-      {upErr && <p className="mt-2 text-xs text-red-600">{upErr}</p>}
       {storedUrl ? (
-        <div className="mt-3 flex items-center justify-center overflow-hidden rounded-xl border border-slate-200 bg-slate-50 p-4">
-          <img src={storedUrl} alt="Aperçu" className="max-h-48 max-w-full object-contain" />
+        <div className="mt-1.5 flex flex-col gap-4 rounded-xl border border-slate-200 bg-slate-50/60 p-3 sm:flex-row sm:items-center">
+          <div className="flex h-28 w-full shrink-0 items-center justify-center overflow-hidden rounded-lg bg-[repeating-conic-gradient(#f1f5f9_0_25%,#fff_0_50%)] bg-[length:16px_16px] ring-1 ring-slate-200 sm:w-40">
+            <img src={storedUrl} alt="Aperçu" className="max-h-full max-w-full object-contain" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-xs text-slate-500" title={storedUrl}>
+              {storedUrl.split("/").pop()}
+            </p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() => inputRef.current?.click()}
+                disabled={uploading}
+                className="inline-flex items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-[color:var(--color-gt-brand-blue)] transition hover:bg-slate-50 disabled:opacity-60"
+              >
+                <IoCloudUploadOutline className="h-4 w-4" aria-hidden />
+                {uploading ? "Téléversement…" : "Remplacer"}
+              </button>
+              <button
+                type="button"
+                onClick={() => setStoredUrl("")}
+                disabled={uploading}
+                className="inline-flex items-center gap-1.5 rounded-lg border border-red-100 bg-red-50 px-3 py-1.5 text-xs font-semibold text-red-700 transition hover:bg-red-100 disabled:opacity-60"
+              >
+                <IoTrashOutline className="h-4 w-4" aria-hidden />
+                Retirer
+              </button>
+            </div>
+          </div>
         </div>
-      ) : null}
+      ) : (
+        <button
+          type="button"
+          onClick={() => inputRef.current?.click()}
+          onDragOver={(e) => {
+            e.preventDefault();
+            setDragOver(true);
+          }}
+          onDragLeave={() => setDragOver(false)}
+          onDrop={(e) => {
+            e.preventDefault();
+            setDragOver(false);
+            void upload(e.dataTransfer.files?.[0]);
+          }}
+          disabled={uploading}
+          className={`mt-1.5 flex w-full flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed px-4 py-7 text-center transition ${
+            dragOver
+              ? "border-[color:var(--color-gt-brand-blue-light)] bg-blue-50"
+              : "border-slate-300 bg-slate-50/60 hover:border-[color:var(--color-gt-brand-blue-light)]/60 hover:bg-blue-50/40"
+          }`}
+        >
+          {uploading ? (
+            <span className="h-7 w-7 animate-spin rounded-full border-2 border-slate-300 border-t-[color:var(--color-gt-brand-blue)]" aria-hidden />
+          ) : (
+            <IoImageOutline className="h-8 w-8 text-slate-400" aria-hidden />
+          )}
+          <span className="text-sm font-semibold text-[color:var(--color-gt-brand-blue)]">
+            {uploading ? "Téléversement en cours…" : "Cliquez ou glissez une image ici"}
+          </span>
+          <span className="text-xs text-slate-500">JPEG, PNG, GIF, WebP ou SVG — 5 Mo maximum</span>
+        </button>
+      )}
+      {upErr && (
+        <p className="mt-1.5 flex items-center gap-1.5 text-xs font-medium text-red-600" role="alert">
+          <IoAlertCircleOutline className="h-4 w-4" aria-hidden />
+          {upErr}
+        </p>
+      )}
+      {hint && !upErr ? <p className="mt-1.5 text-xs text-slate-500">{hint}</p> : null}
     </div>
   );
 }

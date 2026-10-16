@@ -19,6 +19,9 @@ import { HeroBackgroundSlider, HeroSliderDots } from "@/components/home/HeroBack
 import { InfrastructureGallery } from "@/components/infrastructure/InfrastructureGallery";
 import { TeamHomeSection } from "@/components/team/TeamHomeSection";
 import { HERO_SLIDE_COUNT } from "@/components/home/heroSlides";
+import { CompanyHighlights } from "@/components/home/CompanyHighlights";
+import { localizeService } from "@/lib/localizeService";
+import { yearsOfExperience } from "@/lib/companyYears";
 
 type SiteConfig = {
   heroTag?: string;
@@ -201,21 +204,23 @@ export function Home() {
     <div>
       <section className="relative min-h-[520px] overflow-hidden md:min-h-[560px]">
         <HeroBackgroundSlider activeIndex={heroSlide} />
-        <div className="absolute inset-0 bg-gradient-to-r from-[color:var(--color-gt-navy)]/85 via-[color:var(--color-gt-navy)]/65 to-[color:var(--color-gt-navy)]/45" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#010f3a]/90 via-[color:var(--color-gt-brand-blue-dark)]/70 to-[color:var(--color-gt-brand-blue)]/35" />
+        <div className="gt-gold-gradient absolute inset-x-0 bottom-0 z-10 h-1" aria-hidden />
         <div className="relative z-10 mx-auto flex min-h-[520px] max-w-7xl flex-col justify-center px-4 py-24 md:min-h-[560px] md:py-32">
-          <span className="mb-4 inline-flex w-fit rounded-sm bg-[color:var(--color-gt-whatsapp)] px-3 py-1 text-xs font-semibold uppercase tracking-wide text-white">
+          <span className="gt-fade-up mb-5 inline-flex w-fit items-center gap-2 rounded-full border border-[color:var(--color-gt-gold-bright)]/50 bg-black/20 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.2em] text-[color:var(--color-gt-gold-bright)] backdrop-blur-sm">
+            <span className="h-1.5 w-1.5 rounded-full bg-[color:var(--color-gt-gold-bright)]" aria-hidden />
             {(useFrenchCms ? site.heroTag : undefined) ?? t("home.heroTag")}
           </span>
-          <h1 className="max-w-3xl font-[family-name:var(--font-display)] text-4xl font-bold leading-tight text-white md:text-5xl">
+          <h1 className="gt-fade-up max-w-3xl font-[family-name:var(--font-display)] text-4xl font-bold leading-tight text-white [animation-delay:120ms] md:text-5xl lg:text-[3.4rem]">
             {(useFrenchCms ? site.heroTitle : undefined) ?? t("home.heroTitle")}
           </h1>
-          <p className="mt-6 max-w-2xl text-lg leading-relaxed text-white/90">
+          <p className="gt-fade-up mt-6 max-w-2xl text-lg leading-relaxed text-white/90 [animation-delay:240ms]">
             {(useFrenchCms ? site.heroSubtitle : undefined) ?? t("home.heroSubtitle")}
           </p>
-          <div className="mt-10 flex flex-wrap gap-4">
+          <div className="gt-fade-up mt-10 flex flex-wrap gap-4 [animation-delay:360ms]">
             <Link
               to="/activites"
-              className="inline-flex items-center gap-2 rounded-sm bg-[color:var(--color-gt-coral)] px-6 py-3 text-sm font-semibold text-white hover:brightness-110"
+              className="gt-gold-gradient inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-sm font-bold text-[color:var(--color-gt-navy-deep)] shadow-lg shadow-black/25 transition hover:-translate-y-0.5 hover:brightness-105"
             >
               {t("home.discoverServices")}
               <FaArrowRight />
@@ -224,9 +229,9 @@ export function Home() {
               href={companyWhatsAppUrl}
               target="_blank"
               rel="noreferrer"
-              className="inline-flex items-center gap-2 rounded-sm bg-[color:var(--color-gt-whatsapp)] px-6 py-3 text-sm font-semibold text-white hover:brightness-110"
+              className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-7 py-3.5 text-sm font-semibold text-white backdrop-blur-sm transition hover:-translate-y-0.5 hover:bg-white/20"
             >
-              <FaWhatsapp className="text-lg" />
+              <FaWhatsapp className="text-lg text-[color:var(--color-gt-whatsapp)]" />
               {t("home.whatsapp")}
             </a>
           </div>
@@ -269,8 +274,9 @@ export function Home() {
               <p className="mt-2 text-sm text-slate-600">{t("home.ethiopiaDesc")}</p>
             </div>
             <div className="text-center">
-              <span className="font-[family-name:var(--font-display)] text-6xl font-bold text-[color:var(--color-gt-coral)]">
-                {(useFrenchCms ? site.yearsExperience : undefined) ?? "15+"}
+              <span className="font-[family-name:var(--font-display)] text-6xl font-bold text-[color:var(--color-gt-brand-blue)]">
+                {/* Calculé automatiquement chaque année */}
+                {yearsOfExperience()}
               </span>
               <p className="text-sm font-medium text-slate-500">{t("home.yearsExperience")}</p>
             </div>
@@ -390,7 +396,7 @@ export function Home() {
           {t("home.servicesTitle")}
         </h2>
         <div className="mt-12 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-          {services.map((s, idx) => (
+          {services.map((raw) => ({ ...raw, ...localizeService(raw, t, useFrenchCms) })).map((s, idx) => (
             <article
               key={s._id}
               className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm"
@@ -471,6 +477,8 @@ export function Home() {
           </div>
         </div>
       </section>
+
+      <CompanyHighlights />
 
       <TeamHomeSection />
 
@@ -652,7 +660,7 @@ export function Home() {
             <button
               type="submit"
               disabled={contactMut.isPending}
-              className="w-full rounded-lg bg-[color:var(--color-gt-coral)] py-3 font-semibold text-white hover:brightness-110 disabled:opacity-60"
+              className="gt-brand-blue-bg w-full rounded-lg py-3 font-semibold text-white shadow-md shadow-blue-900/20 transition hover:brightness-110 disabled:opacity-60"
             >
               {t("home.quoteCta")}
             </button>

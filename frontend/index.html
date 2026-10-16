@@ -8,15 +8,18 @@
       name="description"
       content="Global Transit and Transport Services — transit, logistique et dédouanement sur le corridor Djibouti – Éthiopie. Import-export, port de Djibouti, Afrique de l'Est."
     />
-    <meta name="theme-color" content="#0050C8" />
+    <meta name="theme-color" content="#043994" />
     <meta name="application-name" content="Global Transit" />
+    <!-- Google Search Console (validation de propriété) — voir aussi public/googleb78ee378d3c6940c.html -->
+    <meta name="google-site-verification" content="Ajfo5njqkDZAn5kN-lpLNmEqIGxRMfrEQ58jk9A-qmc" />
 
-    <link rel="icon" href="/favicon.ico" sizes="48x48" />
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
     <link rel="icon" href="/favicon-48x48.png" type="image/png" sizes="48x48" />
     <link rel="icon" href="/favicon-32x32.png" type="image/png" sizes="32x32" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />
     <link rel="manifest" href="/site.webmanifest" />
+    <link rel="preload" href="/brand/gt-logo.webp" as="image" type="image/webp" fetchpriority="high" />
+    <link rel="preload" href="/brand/splash-port.webp" as="image" type="image/webp" fetchpriority="high" />
 
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Global Transit" />
@@ -26,10 +29,12 @@
       content="Votre partenaire transit et logistique à Djibouti — corridor Djibouti – Éthiopie, dédouanement et transport international."
     />
     <meta property="og:image" content="https://globaltransit-transportservice.com/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
     <meta property="og:url" content="https://globaltransit-transportservice.com/" />
     <meta property="og:locale" content="fr_FR" />
 
-    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Global Transit — Transport &amp; Service" />
     <meta
       name="twitter:description"
@@ -43,8 +48,334 @@
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap"
       rel="stylesheet"
     />
+
+
+    <!--
+      Écran d'introduction : un camion porte-conteneur parcourt la route Djibouti → Corridor → Afrique de l'Est
+      (il sert d'indicateur de chargement). Styles en ligne pour un affichage immédiat, avant le bundle JS.
+      Les mêmes classes servent à la transition entre les pages (RouteTransition.tsx, .gt-loader--route).
+    -->
+    <style>
+      html.gt-splash-active,
+      html.gt-splash-active body {
+        overflow: hidden;
+      }
+      .gt-loader {
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        display: grid;
+        place-items: center;
+        padding: 24px 16px;
+        color: #fff;
+        text-align: center;
+        font-family: "Inter", "Segoe UI", system-ui, sans-serif;
+        -webkit-font-smoothing: antialiased;
+        /* Photo du port (porte-conteneurs à quai) sous un voile bleu de marque */
+        background:
+          linear-gradient(160deg, rgba(4, 48, 127, 0.8) 0%, rgba(2, 26, 85, 0.86) 55%, rgba(1, 15, 58, 0.94) 100%),
+          url(/brand/splash-port.webp) center / cover no-repeat,
+          #021a55;
+        will-change: transform;
+      }
+      .gt-loader::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(60% 50% at 50% 45%, rgba(10, 79, 196, 0.35), transparent 70%);
+        pointer-events: none;
+      }
+      .gt-loader__panel {
+        position: relative;
+      }
+      .gt-loader__panel {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        transition: opacity 0.2s ease;
+      }
+      .gt-loader__badge {
+        display: grid;
+        place-items: center;
+        width: 132px;
+        height: 132px;
+        border-radius: 50%;
+        background: #fff;
+        box-shadow:
+          0 0 0 6px rgba(227, 191, 52, 0.9),
+          0 18px 40px -10px rgba(0, 0, 0, 0.55);
+        animation: gt-pop 0.45s cubic-bezier(0.2, 1.4, 0.4, 1) both;
+      }
+      .gt-loader__badge img {
+        width: 84%;
+        height: auto;
+      }
+      .gt-loader__name {
+        margin: 22px 0 0;
+        font-family: "Playfair Display", Georgia, serif;
+        font-size: clamp(26px, 6vw, 34px);
+        font-weight: 700;
+        line-height: 1.1;
+        animation: gt-up 0.45s ease-out 0.15s both;
+      }
+      .gt-loader__sub {
+        margin: 8px 0 0;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.32em;
+        text-transform: uppercase;
+        color: #bcd2ff;
+        animation: gt-up 0.45s ease-out 0.22s both;
+      }
+      .gt-route {
+        position: relative;
+        width: min(78vw, 360px);
+        height: 64px;
+        margin-top: 30px;
+        animation: gt-up 0.4s ease-out 0.28s both;
+      }
+      .gt-route__track {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 30px;
+        height: 3px;
+        border-radius: 3px;
+        background: rgba(255, 255, 255, 0.18);
+        overflow: hidden;
+      }
+      .gt-route__fill {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(90deg, #c9971a, #f5d66b);
+        transform-origin: left;
+        animation: gt-fill 1.3s cubic-bezier(0.45, 0, 0.25, 1) 0.45s both;
+      }
+      .gt-route__stop {
+        position: absolute;
+        top: 25px;
+        left: var(--x);
+        transform: translateX(-50%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 9px;
+      }
+      .gt-route__stop i {
+        width: 13px;
+        height: 13px;
+        border-radius: 50%;
+        border: 2px solid rgba(255, 255, 255, 0.5);
+        background: #021a55;
+        animation: gt-lit 0.3s ease-out var(--d) both;
+      }
+      .gt-route__stop b {
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        white-space: nowrap;
+        color: rgba(255, 255, 255, 0.55);
+        animation: gt-lit-text 0.3s ease-out var(--d) both;
+      }
+      .gt-route__mover {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 30px;
+        animation: gt-drive 1.3s cubic-bezier(0.45, 0, 0.25, 1) 0.45s both;
+      }
+      .gt-route__mover svg {
+        position: absolute;
+        left: 0;
+        bottom: 1px;
+        width: 54px;
+        height: 30px;
+        transform: translateX(-50%);
+        filter: drop-shadow(0 3px 4px rgba(0, 0, 0, 0.35));
+        animation: gt-bump 0.32s ease-in-out infinite;
+      }
+      .gt-loader__services {
+        margin: 18px 0 0;
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        color: #e3bf34;
+        animation: gt-up 0.4s ease-out 0.35s both;
+      }
+      .gt-loader.is-leaving {
+        animation: gt-leave 0.5s cubic-bezier(0.7, 0, 0.2, 1) both;
+      }
+      .gt-loader.is-leaving .gt-loader__panel {
+        opacity: 0;
+      }
+
+      /* Transition entre les pages : volet bleu de gauche à droite, le camion traverse, puis il sort à droite. */
+      .gt-loader--route {
+        animation: gt-wipe-in 0.24s cubic-bezier(0.7, 0, 0.3, 1) both;
+      }
+      .gt-loader--route .gt-loader__badge {
+        width: 92px;
+        height: 92px;
+        animation-delay: 0.12s;
+      }
+      .gt-loader--route .gt-route {
+        width: min(60vw, 220px);
+        height: 34px;
+        margin-top: 22px;
+        animation: none;
+      }
+      .gt-loader--route .gt-route__fill,
+      .gt-loader--route .gt-route__mover {
+        animation-duration: 0.55s;
+        animation-delay: 0.18s;
+      }
+      .gt-loader--route .gt-route__stop b {
+        display: none;
+      }
+      .gt-loader--route.is-leaving {
+        animation: gt-wipe-out 0.38s cubic-bezier(0.7, 0, 0.3, 1) both;
+      }
+
+      @keyframes gt-pop {
+        from {
+          opacity: 0;
+          transform: scale(0.6);
+        }
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
+      @keyframes gt-up {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
+      @keyframes gt-fill {
+        from {
+          transform: scaleX(0);
+        }
+        to {
+          transform: scaleX(1);
+        }
+      }
+      @keyframes gt-drive {
+        from {
+          transform: translateX(0);
+        }
+        to {
+          transform: translateX(100%);
+        }
+      }
+      @keyframes gt-bump {
+        50% {
+          transform: translateX(-50%) translateY(-1px);
+        }
+      }
+      @keyframes gt-lit {
+        to {
+          border-color: #f5d66b;
+          background: #e3bf34;
+          box-shadow: 0 0 0 4px rgba(227, 191, 52, 0.25);
+        }
+      }
+      @keyframes gt-lit-text {
+        to {
+          color: #f5d66b;
+        }
+      }
+      @keyframes gt-leave {
+        to {
+          transform: translateY(-100%);
+        }
+      }
+      @keyframes gt-wipe-in {
+        from {
+          transform: translateX(-100%);
+        }
+        to {
+          transform: none;
+        }
+      }
+      @keyframes gt-wipe-out {
+        to {
+          transform: translateX(100%);
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .gt-loader,
+        .gt-loader *,
+        .gt-loader.is-leaving {
+          animation: none !important;
+        }
+        .gt-route__mover {
+          transform: translateX(100%);
+        }
+        .gt-loader {
+          transition: opacity 0.3s ease;
+        }
+        .gt-loader.is-leaving {
+          opacity: 0;
+        }
+      }
+    </style>
   </head>
   <body>
+    <div id="gt-splash" class="gt-loader" role="status" aria-label="Chargement — Global Transit and Transport Services">
+      <div class="gt-loader__panel">
+        <div class="gt-loader__badge" aria-hidden="true">
+          <img src="/brand/gt-logo.webp" alt="" width="640" height="602" fetchpriority="high" />
+        </div>
+        <p class="gt-loader__name">Global Transit</p>
+        <p class="gt-loader__sub">and Transport Services</p>
+        <div class="gt-route" aria-hidden="true">
+          <div class="gt-route__track"><span class="gt-route__fill"></span></div>
+          <span class="gt-route__stop" style="--x: 0%; --d: 0.45s"><i></i><b>Djibouti</b></span>
+          <span class="gt-route__stop" style="--x: 50%; --d: 1.05s"><i></i><b>Corridor</b></span>
+          <span class="gt-route__stop" style="--x: 100%; --d: 1.7s"><i></i><b>Afrique de l'Est</b></span>
+          <div class="gt-route__mover">
+            <svg viewBox="0 0 40 22">
+              <rect x="1" y="3" width="25" height="12.5" rx="1.5" fill="#e3bf34" />
+              <path d="M5.5 5v8.5M10 5v8.5M14.5 5v8.5M19 5v8.5M23 5v8.5" stroke="#b8860b" stroke-width="1" />
+              <path d="M27 6.5h6.5l4.8 5.2v3.8H27z" fill="#fff" />
+              <path d="M29 8h4l2.8 3.2H29z" fill="#0a4fc4" />
+              <rect x="1" y="15.5" width="37.3" height="2" rx="1" fill="#fff" />
+              <circle cx="7" cy="19" r="2.6" fill="#010f3a" stroke="#fff" stroke-width="1.3" />
+              <circle cx="19" cy="19" r="2.6" fill="#010f3a" stroke="#fff" stroke-width="1.3" />
+              <circle cx="33" cy="19" r="2.6" fill="#010f3a" stroke="#fff" stroke-width="1.3" />
+            </svg>
+          </div>
+        </div>
+        <p class="gt-loader__services">Transit · Dédouanement · Transport · Logistique</p>
+      </div>
+    </div>
+    <script>
+      (function () {
+        var splash = document.getElementById("gt-splash");
+        if (!splash) return;
+        if (location.pathname.indexOf("/admin") === 0) {
+          splash.parentNode.removeChild(splash);
+          return;
+        }
+        document.documentElement.classList.add("gt-splash-active");
+        // Filet de sécurité si le bundle JS ne se charge jamais.
+        setTimeout(function () {
+          if (!splash.isConnected) return;
+          splash.classList.add("is-leaving");
+          document.documentElement.classList.remove("gt-splash-active");
+          setTimeout(function () {
+            if (splash.parentNode) splash.parentNode.removeChild(splash);
+          }, 600);
+        }, 12000);
+      })();
+    </script>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

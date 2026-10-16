@@ -8,6 +8,9 @@ import { AboutStrengthsSection } from "@/components/about/AboutStrengthsSection"
 import { AboutSectionHeader } from "@/components/about/AboutSectionHeader";
 import { apiFetch } from "@/api/client";
 import { parseAboutConfig } from "@/lib/aboutConfig";
+import { CompanyHighlights, QuoteBanner } from "@/components/home/CompanyHighlights";
+import { CompanyPresentation } from "@/components/about/CompanyPresentation";
+import { COMPANY_FOUNDED_YEAR, yearsOfExperience } from "@/lib/companyYears";
 
 const strengthKeys = [
   "strengthCommunication",
@@ -29,13 +32,16 @@ const serviceCardKeys = [
 ] as const;
 
 const SECTION_LINKS = [
+  { id: "presentation", labelKey: "about.pres.kicker" },
   { id: "mission", labelKey: "about.navMission" },
   { id: "atouts", labelKey: "about.navStrengths" },
   { id: "services", labelKey: "about.navServices" },
 ] as const;
 
 export function AboutPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  /** Les textes saisis dans l'admin sont en français : dans les autres langues, on affiche les traductions. */
+  const useFrenchCms = i18n.resolvedLanguage?.startsWith("fr") ?? false;
   const { hash } = useLocation();
   const navigate = useNavigate();
 
@@ -44,7 +50,7 @@ export function AboutPage() {
     queryFn: () => apiFetch<Record<string, unknown>>("/api/config", { auth: false }),
   });
 
-  const about = parseAboutConfig(cfgRaw?.about);
+  const about = parseAboutConfig(useFrenchCms ? cfgRaw?.about : undefined);
 
   const strengths = about.strengths?.length
     ? about.strengths.filter((s) => !isRemovedStrength(s))
@@ -73,7 +79,7 @@ export function AboutPage() {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(34,197,94,0.18),transparent_50%),radial-gradient(circle_at_10%_85%,rgba(56,189,248,0.12),transparent_45%)]" />
 
         <div className="relative mx-auto max-w-7xl px-4 py-16 sm:px-6 md:py-24 lg:px-8">
-          <p className="text-xs font-bold uppercase tracking-[0.28em] text-emerald-200">
+          <p className="text-xs font-bold uppercase tracking-[0.28em] text-[color:var(--color-gt-gold-bright)]">
             {about.kicker ?? t("about.kicker")}
           </p>
           <h1 className="mt-4 max-w-4xl font-[family-name:var(--font-display)] text-3xl font-bold leading-[1.15] md:text-5xl lg:text-[3.25rem]">
@@ -128,18 +134,24 @@ export function AboutPage() {
 
           <aside className="relative overflow-hidden rounded-3xl border border-[color:var(--color-gt-blue)]/20 bg-gradient-to-br from-[color:var(--color-gt-navy)] to-[#0a1628] p-6 text-white shadow-lg lg:col-span-4 lg:p-8">
             <div className="absolute -right-6 -top-6 h-24 w-24 rounded-full bg-[color:var(--color-gt-accent-green)]/20 blur-2xl" />
-            <p className="text-xs font-bold uppercase tracking-[0.2em] text-emerald-200">
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-[color:var(--color-gt-gold-bright)]">
               {about.experienceKicker ?? t("about.experienceKicker")}
             </p>
+            {/* Calculé automatiquement depuis l'année de création (+1 chaque année) */}
             <p className="mt-3 font-[family-name:var(--font-display)] text-6xl font-bold leading-none">
-              {about.experienceYears ?? t("about.experienceYears")}
+              {t("about.experienceYears", { years: yearsOfExperience() })}
+            </p>
+            <p className="mt-2 text-xs font-semibold uppercase tracking-[0.16em] text-white/60">
+              {t("about.pres.founded")} · {COMPANY_FOUNDED_YEAR}
             </p>
             <p className="mt-4 text-sm leading-relaxed text-slate-300">
-              {about.experienceText ?? t("about.experienceText")}
+              {t("about.experienceText", { years: yearsOfExperience() })}
             </p>
           </aside>
         </div>
       </section>
+
+      <CompanyPresentation />
 
       {/* Contenu principal */}
       <section className="mx-auto max-w-7xl px-4 pb-16 sm:px-6 lg:px-8">
@@ -237,6 +249,9 @@ export function AboutPage() {
           </aside>
         </div>
       </section>
+
+      <CompanyHighlights showProcess={false} />
+      <QuoteBanner />
     </div>
   );
 }

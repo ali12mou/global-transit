@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { FaArrowLeft, FaRegClock } from "react-icons/fa";
 import { apiFetch } from "@/api/client";
 import { formatRelativePast } from "@/lib/relativeTime";
+import { NewsEngagement } from "@/components/news/NewsEngagement";
 
 type NewsDoc = {
   _id: string;
@@ -13,6 +14,8 @@ type NewsDoc = {
   body: string;
   imageUrl: string;
   publishedAt?: string;
+  views?: number;
+  likes?: number;
 };
 
 function PublisherAvatar() {
@@ -154,6 +157,9 @@ export function NewsDetailPage() {
                   </p>
                 ))
               : null}
+          </div>
+          <div className="mt-10">
+            <NewsEngagement detail slug={article.slug} title={article.title} likes={article.likes} views={article.views} />
           </div>
         </div>
       </div>

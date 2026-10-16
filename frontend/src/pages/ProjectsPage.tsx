@@ -60,7 +60,7 @@ export function ProjectsPage() {
                   </div>
                 )}
                 {p.featured && (
-                  <span className="absolute start-4 top-4 rounded-full bg-[color:var(--color-gt-coral)] px-3 py-1 text-xs font-bold text-white">
+                  <span className="absolute start-4 top-4 rounded-full gt-gold-gradient px-3 py-1 text-xs font-bold text-[color:var(--color-gt-navy-deep)]">
                     {t("publicPages.featured")}
                   </span>
                 )}

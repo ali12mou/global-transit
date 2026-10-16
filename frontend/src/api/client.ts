@@ -1,5 +1,16 @@
 const API_BASE = "";
 
+/** Erreur HTTP de l'API (le statut permet par ex. de détecter une session expirée : 401). */
+export class ApiError extends Error {
+  readonly status: number;
+
+  constructor(message: string, status: number) {
+    super(message);
+    this.name = "ApiError";
+    this.status = status;
+  }
+}
+
 export function getToken(): string | null {
   return localStorage.getItem("gt_token");
 }
@@ -59,7 +70,7 @@ export async function apiFetch<T>(
   if (!res.ok) {
     const msg = data?.error ?? res.statusText;
     const hint = data?.details ? ` (${data.details})` : "";
-    throw new Error(`${msg}${hint}`);
+    throw new ApiError(`${msg}${hint}`, res.status);
   }
   return data as T;
 }

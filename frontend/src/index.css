@@ -3,18 +3,21 @@
 @theme {
   --font-display: "Playfair Display", ui-serif, Georgia, serif;
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --color-gt-topbar: #003caa;
-  --color-gt-navy: #0a1628;
-  --color-gt-navy-deep: #00288c;
-  --color-gt-brand-blue: #003caa;
-  --color-gt-brand-blue-light: #0050c8;
-  --color-gt-brand-blue-dark: #00288c;
-  --color-gt-blue: #0c2a5c;
+  /* Couleurs relevées sur le logo : bleu roi #043994, bleu nuit #01175f, or #e3bf34 */
+  --color-gt-topbar: #043994;
+  --color-gt-navy: #071a45;
+  --color-gt-navy-deep: #01175f;
+  --color-gt-brand-blue: #043994;
+  --color-gt-brand-blue-light: #0a4fc4;
+  --color-gt-brand-blue-dark: #01175f;
+  --color-gt-blue: #0a3488;
   --color-gt-accent-green: #2e7d57;
   --color-gt-accent-orange: #e8750a;
   --color-gt-whatsapp: #25d366;
   --color-gt-coral: #e53935;
-  --color-gt-gold: #c9a227;
+  /* Or lisible sur fond clair ; la variante « bright » est réservée aux fonds bleus */
+  --color-gt-gold: #b8860b;
+  --color-gt-gold-bright: #e3bf34;
 }
 
 body {
@@ -62,6 +65,165 @@ body {
 
 @media (prefers-reduced-motion: reduce) {
   .gt-logo-marquee {
+    animation: none;
+  }
+}
+
+/* Rideau de transition / intro : voir index.html (.gt-loader) */
+
+.gt-gold-gradient {
+  background: linear-gradient(135deg, #f7dc7a 0%, #e3bf34 45%, #b8860b 100%);
+}
+
+/* Apparition douce des blocs */
+@keyframes gt-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.gt-fade-up {
+  animation: gt-fade-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes gt-orbit-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.gt-orbit-spin {
+  animation: gt-orbit-spin 14s linear infinite;
+}
+
+@keyframes gt-toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.gt-toast-in {
+  animation: gt-toast-in 0.28s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gt-fade-up,
+  .gt-orbit-spin,
+  .gt-toast-in {
+    animation: none;
+  }
+}
+
+@keyframes gt-drawer-in {
+  from {
+    opacity: 0.4;
+    transform: translateX(32px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.gt-drawer-in {
+  animation: gt-drawer-in 0.32s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gt-drawer-in {
+    animation: none;
+  }
+}
+
+/* Scène logistique animée (page de connexion) */
+@keyframes gt-waves {
+  to {
+    transform: translateX(-800px);
+  }
+}
+
+.gt-waves-slow {
+  animation: gt-waves 22s linear infinite;
+}
+
+.gt-waves-fast {
+  animation: gt-waves 13s linear infinite;
+}
+
+@keyframes gt-ship-sail {
+  from {
+    transform: translateX(-160px);
+  }
+  to {
+    transform: translateX(820px);
+  }
+}
+
+.gt-ship-sail {
+  animation: gt-ship-sail 34s linear infinite;
+}
+
+@keyframes gt-ship-bob {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(3px) rotate(-1.2deg);
+  }
+}
+
+.gt-ship-bob {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: gt-ship-bob 3.2s ease-in-out infinite;
+}
+
+@keyframes gt-truck-drive {
+  from {
+    transform: translateX(860px);
+  }
+  to {
+    transform: translateX(-120px);
+  }
+}
+
+.gt-truck-drive {
+  animation: gt-truck-drive 12s linear infinite;
+}
+
+/* Icône navire de la carte de connexion */
+@keyframes gt-bob {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-3px) rotate(-4deg);
+  }
+}
+
+.gt-bob {
+  animation: gt-bob 2.6s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gt-waves-slow,
+  .gt-waves-fast,
+  .gt-ship-sail,
+  .gt-ship-bob,
+  .gt-truck-drive,
+  .gt-bob {
     animation: none;
   }
 }

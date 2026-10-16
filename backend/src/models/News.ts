@@ -10,6 +10,9 @@ const newsSchema = new Schema(
     publishedAt: { type: Date },
     /** Visible sur le site public `/api/news` uniquement si `true`. */
     published: { type: Boolean, default: true },
+    /** Compteurs publics (page /actualites) */
+    views: { type: Number, default: 0, min: 0 },
+    likes: { type: Number, default: 0, min: 0 },
   },
   { timestamps: true }
 );

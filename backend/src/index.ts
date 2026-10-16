@@ -7,6 +7,7 @@ import { connectDb } from "./config/db.js";
 import { authRouter } from "./routes/auth.js";
 import { publicRouter } from "./routes/public.js";
 import { contactPublicRouter } from "./routes/contactPublic.js";
+import { trackPublicRouter } from "./routes/trackPublic.js";
 import { uploadRoutes } from "./routes/uploadRoutes.js";
 import { adminRouter } from "./routes/admin.js";
 
@@ -34,6 +35,7 @@ app.get("/api/health", (_req, res) => {
 app.use("/api/auth", authRouter);
 app.use("/api", publicRouter);
 app.use("/api/contact", contactPublicRouter);
+app.use("/api/track", trackPublicRouter);
 app.use("/api/admin", uploadRoutes);
 app.use("/api/admin", adminRouter);
 

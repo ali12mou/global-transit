@@ -17,6 +17,7 @@ import { Configuration } from "../models/Configuration.js";
 import { User } from "../models/User.js";
 import { Role } from "../models/Role.js";
 import { slugify } from "../utils/slug.js";
+import { buildVisitStats } from "../lib/visitStats.js";
 
 export const adminRouter = Router();
 
@@ -70,6 +71,8 @@ adminRouter.get(
         recentProjects,
         recentCareers,
         lastLoginsRaw,
+        infrastructuresCount,
+        visits,
       ] = await Promise.all([
         Contact.countDocuments({ status: "new" }),
         Contact.countDocuments(),
@@ -119,6 +122,8 @@ adminRouter.get(
           .limit(8)
           .select("email lastLogin")
           .lean(),
+        Infrastructure.countDocuments(),
+        buildVisitStats(now),
       ]);
 
       const contactsByMonth = buildLast6MonthsSeries(contactsAgg, now);
@@ -197,6 +202,39 @@ adminRouter.get(
         newsByMonth,
         lastLogins,
         recentActivity,
+        infrastructuresCount,
+        visits,
+      });
+    } catch (e) {
+      next(e);
+    }
+  }
+);
+
+/** Badge de notifications de la barre admin : messages de contact non lus. */
+adminRouter.get(
+  "/notifications",
+  authRequired,
+  requirePermission("contact.read"),
+  async (_req, res, next) => {
+    try {
+      const [unread, latest] = await Promise.all([
+        Contact.countDocuments({ status: "new" }),
+        Contact.find({ status: "new" })
+          .sort({ createdAt: -1 })
+          .limit(6)
+          .select("fullName email service createdAt")
+          .lean(),
+      ]);
+      res.json({
+        unread,
+        items: latest.map((c) => ({
+          id: String(c._id),
+          fullName: String(c.fullName ?? ""),
+          email: String(c.email ?? ""),
+          service: String(c.service ?? ""),
+          at: (c.createdAt as Date).toISOString(),
+        })),
       });
     } catch (e) {
       next(e);

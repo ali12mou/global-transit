@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { FaEnvelope, FaWhatsapp, FaCopy, FaPhone } from "react-icons/fa";
 import { apiFetch } from "@/api/client";
+import { useAdminFeedback } from "./ui/AdminFeedback";
 import {
   buildMailtoReply,
   buildWhatsAppUrl,
@@ -18,12 +19,22 @@ type ContactRow = {
   message: string;
   status: string;
   createdAt: string;
+  company?: string;
+  jobTitle?: string;
+  phone?: string;
+  country?: string;
+  subject?: string;
+  route?: string;
+  preferredContact?: string;
 };
+
+const DETAIL_FIELDS = ["subject", "company", "jobTitle", "phone", "country", "route", "preferredContact"] as const;
 
 export function AdminContactsPage() {
   const { t } = useTranslation();
   const qc = useQueryClient();
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const feedback = useAdminFeedback();
 
   const { data = [], isLoading, error } = useQuery({
     queryKey: ["admin-contacts"],
@@ -36,7 +47,13 @@ export function AdminContactsPage() {
         method: "PATCH",
         body: JSON.stringify({ status }),
       }),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["admin-contacts"] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["admin-contacts"] });
+      qc.invalidateQueries({ queryKey: ["admin-notifications"] });
+      qc.invalidateQueries({ queryKey: ["admin-dashboard"] });
+      feedback.success(t("adminContacts.statusUpdated"));
+    },
+    onError: (e) => feedback.error(t("adminContacts.statusError"), (e as Error).message),
   });
 
   async function copyMessage(text: string, id: string) {
@@ -69,7 +86,8 @@ export function AdminContactsPage() {
 
       <div className="mt-8 space-y-6">
         {data.map((c) => {
-          const phone = extractPhoneDigitsFromMessage(c.message);
+          const phone = (c.phone ?? "").replace(/\D/g, "") || extractPhoneDigitsFromMessage(c.message);
+          const details = DETAIL_FIELDS.filter((k) => (c[k] ?? "").trim() !== "");
           const mailto = buildMailtoReply(c.email, c.fullName);
           const waClient = phone ? buildWhatsAppUrl(phone, `Bonjour ${c.fullName}, concernant votre demande Global Transit : `) : null;
           const waCompany = buildWhatsAppUrl(
@@ -123,7 +141,17 @@ export function AdminContactsPage() {
 
               <div className="grid gap-4 px-5 py-5 md:grid-cols-[1fr_auto] md:items-start md:gap-6 md:px-6 md:py-6">
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Message</p>
+                  {details.length > 0 && (
+                    <dl className="mb-5 grid gap-x-6 gap-y-3 rounded-xl border border-slate-100 bg-white p-4 sm:grid-cols-2">
+                      {details.map((k) => (
+                        <div key={k}>
+                          <dt className="text-[11px] font-semibold uppercase tracking-wide text-slate-500">{t(`adminContacts.field.${k}`)}</dt>
+                          <dd className="mt-0.5 text-sm font-medium text-[color:var(--color-gt-navy)]">{c[k]}</dd>
+                        </div>
+                      ))}
+                    </dl>
+                  )}
+                  <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">{t("adminContacts.messageLabel")}</p>
                   <pre className="mt-2 max-h-64 overflow-auto whitespace-pre-wrap rounded-xl bg-slate-50 p-4 text-sm leading-relaxed text-slate-800 ring-1 ring-slate-100">
                     {c.message || "—"}
                   </pre>
@@ -188,7 +216,7 @@ export function AdminContactsPage() {
         })}
         {data.length === 0 && (
           <p className="rounded-2xl border border-dashed border-slate-200 bg-slate-50/50 px-6 py-12 text-center text-slate-500">
-            Aucun message.
+            {t("adminContacts.empty")}
           </p>
         )}
       </div>

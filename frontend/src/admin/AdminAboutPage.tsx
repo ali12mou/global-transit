@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { apiFetch } from "@/api/client";
+import { COMPANY_FOUNDED_YEAR, yearsOfExperience } from "@/lib/companyYears";
 
 type AboutConfig = {
   kicker?: string;
@@ -302,6 +303,11 @@ export function AdminAboutPage() {
 
         <section className="space-y-3 rounded-xl border border-slate-200 p-4">
           <h2 className="text-sm font-semibold text-slate-800">Bloc Expérience</h2>
+          <p className="rounded-lg border border-blue-100 bg-blue-50/70 px-3 py-2 text-xs leading-relaxed text-slate-700">
+            Le nombre d&apos;années et son texte sont <strong>calculés automatiquement</strong> à partir de l&apos;année de
+            création ({COMPANY_FOUNDED_YEAR}) : {yearsOfExperience()} ans aujourd&apos;hui, +1 chaque année, dans toutes les
+            langues. Seul le « kicker » ci-dessous est encore utilisé.
+          </p>
           <div className="grid gap-4 md:grid-cols-3">
             <TextField
               label="Experience - kicker"

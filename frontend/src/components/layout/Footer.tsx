@@ -1,39 +1,62 @@
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { FaLinkedin, FaTwitter, FaGlobe, FaMapMarkerAlt, FaPhone, FaWhatsapp, FaEnvelope } from "react-icons/fa";
+import { FaLinkedin, FaTwitter, FaGlobe, FaMapMarkerAlt, FaPhone, FaWhatsapp, FaEnvelope, FaCode } from "react-icons/fa";
 import { Logo } from "@/components/brand/Logo";
+import { buildWhatsAppUrl, COMPANY_WHATSAPP_DIGITS } from "@/lib/contactReply";
+
+/** Crédit de réalisation du site (affiché en bas de page). */
+const SITE_DEVELOPER = {
+  name: "Ing. Moustapha Mohamed Yacoub",
+  phoneDisplay: "+253 77 75 66 38",
+  phoneHref: "tel:+25377756638",
+} as const;
+
+const linkClass = "text-white/70 transition hover:text-[color:var(--color-gt-gold-bright)]";
+const iconClass = "mt-0.5 shrink-0 text-[color:var(--color-gt-gold-bright)]";
 
 export function Footer() {
   const { t } = useTranslation();
   const year = new Date().getFullYear();
 
   return (
-    <footer className="gt-brand-blue-bg text-slate-200">
-      <div className="mx-auto max-w-7xl px-4 py-14">
-        <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-4">
+    <footer className="relative overflow-hidden bg-[linear-gradient(160deg,#032a7a_0%,#021c5c_45%,#010f3a_100%)] text-white">
+      <div className="gt-gold-gradient h-1 w-full" aria-hidden />
+      <div
+        className="pointer-events-none absolute inset-0 opacity-[0.07]"
+        style={{
+          backgroundImage:
+            "linear-gradient(rgba(255,255,255,.6) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.6) 1px, transparent 1px)",
+          backgroundSize: "56px 56px",
+        }}
+        aria-hidden
+      />
+      <div className="pointer-events-none absolute -right-32 -top-32 h-96 w-96 rounded-full bg-[color:var(--color-gt-gold-bright)]/10 blur-3xl" aria-hidden />
+
+      <div className="relative mx-auto max-w-7xl px-4 py-14 md:py-16">
+        <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-[1.35fr_1fr_1fr_1.35fr]">
           <div>
             <Logo variant="footer" />
-            <p className="mt-4 text-sm leading-relaxed text-slate-400">{t("footer.tagline")}</p>
-            <div className="mt-5 flex gap-3">
+            <p className="mt-5 max-w-sm text-sm leading-relaxed text-white/70">{t("footer.tagline")}</p>
+            <div className="mt-6 flex gap-3">
               <a
                 href="https://www.linkedin.com/company/115782426/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex h-10 w-10 items-center justify-center rounded-full border border-white/25 text-white hover:bg-white/10"
+                className="flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-white/5 text-white transition hover:border-[color:var(--color-gt-gold-bright)] hover:text-[color:var(--color-gt-gold-bright)]"
                 aria-label="LinkedIn"
               >
                 <FaLinkedin />
               </a>
               <a
                 href="#"
-                className="flex h-10 w-10 items-center justify-center rounded-full border border-white/25 text-white hover:bg-white/10"
+                className="flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-white/5 text-white transition hover:border-[color:var(--color-gt-gold-bright)] hover:text-[color:var(--color-gt-gold-bright)]"
                 aria-label="Twitter"
               >
                 <FaTwitter />
               </a>
               <a
                 href="#"
-                className="flex h-10 w-10 items-center justify-center rounded-full border border-white/25 text-white hover:bg-white/10"
+                className="flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-white/5 text-white transition hover:border-[color:var(--color-gt-gold-bright)] hover:text-[color:var(--color-gt-gold-bright)]"
                 aria-label="Site"
               >
                 <FaGlobe />
@@ -41,25 +64,39 @@ export function Footer() {
             </div>
           </div>
 
-          <div className="rounded-xl border border-white/10 bg-white/[0.03] p-6">
-            <h3 className="font-[family-name:var(--font-display)] text-lg text-white">{t("footer.aboutTitle")}</h3>
-            <ul className="mt-4 space-y-2 text-sm">
+          <div>
+            <h3 className="text-xs font-bold uppercase tracking-[0.22em] text-[color:var(--color-gt-gold-bright)]">
+              {t("footer.aboutTitle")}
+            </h3>
+            <ul className="mt-5 space-y-3 text-sm">
               <li>
-                <Link to="/a-propos" className="text-slate-400 hover:text-white">
+                <Link to="/a-propos" className={linkClass}>
                   {t("footer.company")}
                 </Link>
               </li>
               <li>
-                <Link to="/equipe" className="text-slate-400 hover:text-white">
+                <Link to="/equipe" className={linkClass}>
                   {t("footer.team")}
+                </Link>
+              </li>
+              <li>
+                <Link to="/actualites" className={linkClass}>
+                  {t("nav.news")}
+                </Link>
+              </li>
+              <li>
+                <Link to="/contact" className={linkClass}>
+                  {t("nav.contact")}
                 </Link>
               </li>
             </ul>
           </div>
 
-          <div className="rounded-xl border border-white/10 bg-white/[0.03] p-6">
-            <h3 className="font-[family-name:var(--font-display)] text-lg text-white">{t("footer.activitiesTitle")}</h3>
-            <ul className="mt-4 space-y-2 text-sm text-slate-400">
+          <div>
+            <h3 className="text-xs font-bold uppercase tracking-[0.22em] text-[color:var(--color-gt-gold-bright)]">
+              {t("footer.activitiesTitle")}
+            </h3>
+            <ul className="mt-5 space-y-3 text-sm text-white/70">
               <li>Clearance</li>
               <li>Logistics</li>
               <li>Transit</li>
@@ -68,57 +105,85 @@ export function Footer() {
             </ul>
           </div>
 
-          <div className="rounded-xl border border-white/10 bg-white/[0.03] p-6">
-            <h3 className="font-[family-name:var(--font-display)] text-lg text-white">{t("footer.hqTitle")}</h3>
-            <ul className="mt-4 space-y-3 text-sm">
-              <li className="flex gap-2 text-slate-300">
-                <FaMapMarkerAlt className="mt-0.5 shrink-0 text-[color:var(--color-gt-accent-green)]" />
+          <div>
+            <h3 className="text-xs font-bold uppercase tracking-[0.22em] text-[color:var(--color-gt-gold-bright)]">
+              {t("footer.hqTitle")}
+            </h3>
+            <ul className="mt-5 space-y-3 text-sm">
+              <li className="flex gap-3 text-white/80">
+                <FaMapMarkerAlt className={iconClass} />
                 {t("footer.address")}
               </li>
-              <li className="flex items-center gap-2 text-slate-300">
-                <FaPhone className="text-[color:var(--color-gt-accent-green)]" />
-                +253 21 34 17 16
+              <li className="flex gap-3">
+                <FaPhone className={iconClass} />
+                <a href="tel:+25321341716" className={linkClass} dir="ltr">
+                  +253 21 34 17 16
+                </a>
               </li>
-              <li className="flex items-center gap-2 text-slate-300">
-                <FaPhone className="text-[color:var(--color-gt-accent-green)]" />
-                +253 77 82 18 32
+              <li className="flex gap-3">
+                <FaPhone className={iconClass} />
+                <a href="tel:+25377821832" className={linkClass} dir="ltr">
+                  +253 77 82 18 32
+                </a>
               </li>
-              <li className="flex items-center gap-2 text-slate-300">
-                <FaWhatsapp className="text-[color:var(--color-gt-accent-green)]" />
-                +253 77 69 61 30 (WhatsApp)
+              <li className="flex gap-3">
+                <FaWhatsapp className={iconClass} />
+                <a href={buildWhatsAppUrl(COMPANY_WHATSAPP_DIGITS)} target="_blank" rel="noopener noreferrer" className={linkClass} dir="ltr">
+                  +253 77 69 61 30 (WhatsApp)
+                </a>
               </li>
-              <li className="flex items-center gap-2 text-slate-300">
-                <FaEnvelope className="text-[color:var(--color-gt-accent-green)]" />
-                info@gttsgroup.com
+              <li className="flex gap-3">
+                <FaEnvelope className={iconClass} />
+                <a href="mailto:info@gttsgroup.com" className={linkClass}>
+                  info@gttsgroup.com
+                </a>
               </li>
             </ul>
           </div>
         </div>
       </div>
 
-      <div className="border-t border-white/10">
-        <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-6 text-xs text-slate-500 md:flex-row md:items-center md:justify-between">
-          <div>
-            <p>{t("footer.copyright", { year })}</p>
-            <p className="mt-1">
-              {t("footer.developedBy")}{" "}
-              <a href="https://geosomtech.fr" className="text-[color:var(--color-gt-accent-green)] hover:underline">
-                geosomtech.fr
+      <div className="relative border-t border-white/10 bg-black/15">
+        <div className="mx-auto flex max-w-7xl flex-col gap-5 px-4 py-6 text-xs md:flex-row md:items-center md:justify-between">
+          <div className="space-y-2">
+            <p className="text-white/75">{t("footer.copyright", { year })}</p>
+            <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-white/65">
+              <FaCode className="text-[color:var(--color-gt-gold-bright)]" aria-hidden />
+              <span>{t("footer.builtBy")} :</span>
+              <span className="font-semibold text-white">{SITE_DEVELOPER.name}</span>
+              <span className="text-white/30" aria-hidden>
+                ·
+              </span>
+              <a
+                href={SITE_DEVELOPER.phoneHref}
+                className="inline-flex items-center gap-1.5 font-semibold text-[color:var(--color-gt-gold-bright)] hover:underline"
+                dir="ltr"
+              >
+                <FaPhone className="h-3 w-3" aria-hidden />
+                {SITE_DEVELOPER.phoneDisplay}
+              </a>
+              <span className="text-white/30" aria-hidden>
+                ·
+              </span>
+              <a href="https://geosomtech.fr" target="_blank" rel="noopener noreferrer" className="hover:text-white hover:underline">
+                GEOSOM Technologies
               </a>
             </p>
           </div>
-          <div className="flex flex-wrap gap-4 text-[color:var(--color-gt-accent-green)]">
-            <Link to="/admin/login" className="hover:underline">
+          <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
+            <Link to="/admin/login" className={linkClass}>
               {t("footer.admin")}
             </Link>
-            <span className="text-white/20">|</span>
-            <a href="#" className="hover:underline">
+            <span className="text-white/20" aria-hidden>
+              |
+            </span>
+            <a href="#" className={linkClass}>
               {t("footer.privacy")}
             </a>
-            <a href="#" className="hover:underline">
+            <a href="#" className={linkClass}>
               {t("footer.terms")}
             </a>
-            <a href="#" className="hover:underline">
+            <a href="#" className={linkClass}>
               {t("footer.compliance")}
             </a>
           </div>

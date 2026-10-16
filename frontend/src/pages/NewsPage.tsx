@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { FaRegCommentDots } from "react-icons/fa";
 import { apiFetch } from "@/api/client";
 import { formatRelativePast } from "@/lib/relativeTime";
+import { NewsEngagement } from "@/components/news/NewsEngagement";
 
 type NewsItem = {
   _id: string;
@@ -13,6 +14,8 @@ type NewsItem = {
   body?: string;
   imageUrl: string;
   publishedAt?: string;
+  views?: number;
+  likes?: number;
 };
 
 function estimateReadMinutes(body: string, excerpt: string): number {
@@ -188,13 +191,16 @@ export function NewsPage() {
                         </Link>
                       ) : null}
 
-                      <div className="flex items-center justify-end border-t border-slate-100 px-4 py-3 sm:px-5 md:px-6 md:py-3.5">
-                        <Link
-                          to={`/actualites/${encodeURIComponent(n.slug)}`}
-                          className="min-h-[44px] min-w-[44px] content-center text-sm font-semibold text-[color:var(--color-gt-blue)] transition hover:underline sm:min-h-0 sm:min-w-0"
-                        >
-                          {t("publicPages.readMore")} →
-                        </Link>
+                      <div className="space-y-3 border-t border-slate-100 px-4 py-3 sm:px-5 md:px-6 md:py-4">
+                        <NewsEngagement slug={n.slug} title={n.title} likes={n.likes} views={n.views} />
+                        <div className="flex justify-end">
+                          <Link
+                            to={`/actualites/${encodeURIComponent(n.slug)}`}
+                            className="min-h-[44px] min-w-[44px] content-center text-sm font-semibold text-[color:var(--color-gt-blue)] transition hover:underline sm:min-h-0 sm:min-w-0"
+                          >
+                            {t("publicPages.readMore")} →
+                          </Link>
+                        </div>
                       </div>
                     </article>
                   );
