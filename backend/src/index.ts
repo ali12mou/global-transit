@@ -3,7 +3,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import express from "express";
 import cors from "cors";
-import { connectDb } from "./config/db.js";
+import { connectDbWithRetry, isDbConnected } from "./config/db.js";
 import { authRouter } from "./routes/auth.js";
 import { publicRouter } from "./routes/public.js";
 import { contactPublicRouter } from "./routes/contactPublic.js";
@@ -29,7 +29,17 @@ app.use(express.json({ limit: "2mb" }));
 app.use("/uploads", express.static(uploadsRoot));
 
 app.get("/api/health", (_req, res) => {
-  res.json({ ok: true });
+  const db = isDbConnected();
+  res.status(db ? 200 : 503).json({ ok: db, db: db ? "connected" : "disconnected" });
+});
+
+// Tant que MongoDB n'est pas joignable, réponse 503 explicite plutôt qu'une requête bloquée.
+app.use("/api", (_req, res, next) => {
+  if (isDbConnected()) {
+    next();
+    return;
+  }
+  res.status(503).json({ error: "Base de données indisponible, réessayez dans quelques instants" });
 });
 
 app.use("/api/auth", authRouter);
@@ -49,7 +59,7 @@ app.use((err: unknown, _req: express.Request, res: express.Response, _next: expr
   });
 });
 
-await connectDb(MONGODB_URI);
 app.listen(PORT, () => {
   console.log(`API écoute sur http://localhost:${PORT}`);
 });
+connectDbWithRetry(MONGODB_URI);

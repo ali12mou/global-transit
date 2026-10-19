@@ -467,6 +467,7 @@
     "hidePassword": "Hide password",
     "sessionExpired": "Your session has expired. Please sign in again.",
     "loginErrorTitle": "Unable to sign in",
+    "loginServerUnavailable": "The server is temporarily unavailable. Please try again in a moment.",
     "overview": {
       "subtitle": "Track website audience, the state of your content and client requests.",
       "noComparison": "no comparison yet",

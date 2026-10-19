@@ -14,7 +14,7 @@ import {
   IoNotificationsOutline,
   IoShieldCheckmarkOutline,
 } from "react-icons/io5";
-import { apiFetch, setToken } from "@/api/client";
+import { ApiError, apiFetch, setToken } from "@/api/client";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { LogisticsScene } from "@/components/brand/LogisticsScene";
 
@@ -68,7 +68,7 @@ export function AdminLogin() {
       }
       nav("/admin");
     } catch (e) {
-      setErr((e as Error).message);
+      setErr(e instanceof ApiError && e.status >= 502 ? t("admin.loginServerUnavailable") : (e as Error).message);
     } finally {
       setLoading(false);
     }

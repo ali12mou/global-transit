@@ -467,6 +467,7 @@
     "hidePassword": "Masquer le mot de passe",
     "sessionExpired": "Votre session a expiré. Merci de vous reconnecter.",
     "loginErrorTitle": "Connexion impossible",
+    "loginServerUnavailable": "Le serveur est momentanément indisponible. Réessayez dans quelques instants.",
     "overview": {
       "subtitle": "Suivez l’audience du site, l’état de vos contenus et les demandes de vos clients.",
       "noComparison": "pas encore de comparaison",

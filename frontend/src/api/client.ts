@@ -22,6 +22,24 @@ export function setToken(token: string | null) {
 
 import type { UploadCategory } from "@/uploadCategory";
 
+type ErrorBody = { error?: string; details?: string };
+
+/** Corps JSON de la réponse ; une page HTML (ex. 502 nginx quand l'API est arrêtée) devient une ApiError lisible. */
+function parseBody(text: string, res: Response): unknown {
+  if (!text) return null;
+  try {
+    return JSON.parse(text);
+  } catch {
+    const msg =
+      res.status >= 500
+        ? `Serveur indisponible (${res.status}), réessayez dans quelques instants`
+        : res.ok
+          ? "Réponse invalide du serveur"
+          : res.statusText || `Erreur ${res.status}`;
+    throw new ApiError(msg, res.status);
+  }
+}
+
 /** Téléverse une image ; la réponse contient `url` (ex. `/uploads/services/…`) à enregistrer dans le champ cible. */
 export async function apiUploadImage(file: File, category: UploadCategory): Promise<{ url: string }> {
   const fd = new FormData();
@@ -36,10 +54,9 @@ export async function apiUploadImage(file: File, category: UploadCategory): Prom
     body: fd,
     headers,
   });
-  const text = await res.text();
-  const data = text ? JSON.parse(text) : null;
+  const data = parseBody(await res.text(), res) as ({ url: string } & ErrorBody) | null;
   if (!res.ok) {
-    throw new Error(data?.error ?? res.statusText);
+    throw new ApiError(data?.error ?? res.statusText, res.status);
   }
   return data as { url: string };
 }
@@ -58,15 +75,7 @@ export async function apiFetch<T>(
   }
   const res = await fetch(`${API_BASE}${path}`, { ...options, headers });
   if (res.status === 204) return undefined as T;
-  const text = await res.text();
-  let data: { error?: string; details?: string } | null = null;
-  if (text) {
-    try {
-      data = JSON.parse(text) as { error?: string; details?: string };
-    } catch {
-      throw new Error(text.slice(0, 200) || res.statusText);
-    }
-  }
+  const data = parseBody(await res.text(), res) as ErrorBody | null;
   if (!res.ok) {
     const msg = data?.error ?? res.statusText;
     const hint = data?.details ? ` (${data.details})` : "";
